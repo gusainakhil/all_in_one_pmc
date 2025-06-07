@@ -15,7 +15,7 @@ if (isset($_GET['token']) && !empty($_GET['token'])) {
         $_SESSION['db_usertype'] = $row['db_usertype'];
         $_SESSION['OrgID'] = $row['OrgID'];
 
-        
+         
     }
 }
 if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {

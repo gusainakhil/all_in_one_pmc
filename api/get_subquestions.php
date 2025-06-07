@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Database config
-$host = "localhost";
+$host = "97.74.91.11";
 $dbname = "beatme_pmc_database";
 $username = "beatme_pmc";
 $password = "&r(x0xzIuoOS";
