@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                          <!--submit button  -->
                          <div class="col-span-2">
-                            <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Division</button>
+                            <button type="submit" class=" bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create Division</button>
                          </div>
                 </form>
             </div>

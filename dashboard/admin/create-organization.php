@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>create division</title>
+    <title>create organization</title>
     <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
@@ -67,11 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (isset($errorMsg)) {
                     echo '<div class="mt-4 text-red-600">' . htmlspecialchars($errorMsg) . '</div>';
                 }
-                ?>
+                ?></div>
                         </div>
                          <!--submit button  -->
-                         <div class="col-span-2">
-                            <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create organization</button>
+                         <div class="col-span-1 md:col-span-2">
+                            <button type="submit" class=" bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create organization</button>
                          </div>
                 </form>
             </div>
