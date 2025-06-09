@@ -59,7 +59,7 @@
                 <a href="create-user.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create User</a>
             </div>
         </div>
-        <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-layer-group w-5"></i> Type</a>
+        <!-- <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-layer-group w-5"></i> Type</a> -->
         
     </nav>
 </aside>
