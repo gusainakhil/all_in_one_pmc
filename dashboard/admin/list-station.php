@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 echo "<tr>";
                                 echo "<td class='py-2 px-4 border-b'>" . htmlspecialchars($row['stationName']) . "</td>";
                                 echo "<td class='py-2 px-4 border-b'>";
-                                echo "<a href='edit-station.php?id=" . $row['stationId'] . "' class='text-blue-500 hover:underline'>Edit</a> | ";
-                                echo "<a href='delete-station.php?id=" . $row['stationId'] . "' class='text-red-500 hover:underline'>Delete</a>";
+                                echo "<a href='edit-station.php?stationId=" . $row['stationId'] . "' class='text-blue-500 hover:underline'>Edit</a> | ";
+                                echo "<a href='add-weightage.php?stationId=" . $row['stationId'] . "' class='text-red-500 hover:underline'>Add weightage</a>";
                                 echo "</td>";
                                 echo "</tr>";
                             }

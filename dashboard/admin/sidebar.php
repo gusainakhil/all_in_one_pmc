@@ -17,7 +17,9 @@
             <img src="https://pa.beatlebuddy.com/assets/railway_logo.jpg" alt="Logo" class="w-10 h-10 mr-2">
             <span class="text-xl font-bold">Beatle Analytics</span>
         </div>
+         <hr>
         <a href="dashboard.php" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-home w-5"></i> Dashboard</a>
+         <hr>
         <!-- User Dropdown (Desktop) -->
         <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
@@ -29,6 +31,7 @@
                 <a href="list-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
+         <hr>
         <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
                 <i class="fas fa-train w-5"></i> Create Station
@@ -39,6 +42,7 @@
                 <a href="list-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
+         <hr>
         <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
                 <i class="fas fa-sitemap w-5"></i> Create Organization
@@ -49,6 +53,7 @@
                 <a href="list-organisation.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
+        <hr>
         <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
                 <i class="fas fa-user w-5"></i> User
@@ -59,6 +64,7 @@
                 <a href="create-user.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create User</a>
             </div>
         </div>
+         <hr>
         <!-- <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-layer-group w-5"></i> Type</a> -->
         
     </nav>

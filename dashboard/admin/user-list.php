@@ -21,6 +21,8 @@ $result = $conn->query($sql);
   <!-- Sidebar -->
    <?php include 'sidebar.php'; ?>
 
+    
+
 
 
 
@@ -28,7 +30,7 @@ $result = $conn->query($sql);
   <main class="flex-1 overflow-y-auto p-6">
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-semibold text-gray-800">station cleaning </h1>
-      <a href="../user-dashboard/index.php" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add User</a>
+      <a href="../user-dashboard/create-user.php" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add User</a>
     </div>
 
     <!-- Card -->

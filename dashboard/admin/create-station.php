@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $questionIds[] = $conn->insert_id;
             }
             $stmtQ->close();
+            
         }
     }
     // If at least one question inserted, use the first queId for db_questionsId
@@ -71,6 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
 </head>
+
+
+<!-- create form -->
+
 
 <body class="bg-gray-100">
 
