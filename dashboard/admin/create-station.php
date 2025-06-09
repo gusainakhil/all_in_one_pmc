@@ -13,13 +13,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $station_login_id = $_POST['db_stLoginId'];
     $zoneName = $_POST['zoneName'];
     $divisionId = $_POST['DivisionId'];
+    $reportType = isset($_POST['reportType']) ? $_POST['reportType'] : [];
+
+    // Insert into baris_question for each selected reportType
+    // Prepare a comma-separated list of selected subqueIds for subqueId column
+    $subqueIdsCsv = implode(',', array_map('intval', $reportType));
+
+    $questionIds = [];
+    if (!empty($subqueIdsCsv)) {
+        $stmtQ = $conn->prepare("INSERT INTO baris_question (queName, subqueId) VALUES (?, ?)");
+        if ($stmtQ) {
+            $queName = "PMC";
+            $stmtQ->bind_param("ss", $queName, $subqueIdsCsv);
+            if ($stmtQ->execute()) {
+                $questionIds[] = $conn->insert_id;
+            }
+            $stmtQ->close();
+        }
+    }
+    // If at least one question inserted, use the first queId for db_questionsId
+    $db_questionsId = !empty($questionIds) ? $questionIds[0] : null;
+    
+
     try {
-        $stmt = $conn->prepare("INSERT INTO baris_station (stationName, db_stLoginId, zoneName, divisionId) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO baris_station (stationName, db_stLoginId, zoneName, divisionId , db_questionsId) VALUES (?, ?, ?, ?, ?)");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
 
-        if (!$stmt->bind_param("sssi", $stationName, $station_login_id, $zoneName, $divisionId)) {
+        if (!$stmt->bind_param("ssssi", $stationName, $station_login_id, $zoneName, $divisionId, $db_questionsId)) {
             throw new Exception("Bind param failed: " . $stmt->error);
         }
 
@@ -105,6 +127,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     ?>
                 </select>
             </div>
+
+            <!-- generate check box for station type -->
+            <div>
+                <label class="block text-gray-700">Select Report</label>
+                <div class="mt-1">
+                    <?php
+                    //fetch station types from database
+                    $reportType = $conn->query("SELECT subqueName, MIN(subqueId) AS subqueId FROM baris_subquestion GROUP BY subqueName;");
+                    if ($reportType && $reportType->num_rows > 0) {
+                        while ($type = $reportType->fetch_assoc()) {
+                            echo '<label class="inline-flex items-center">
+                                    <input type="checkbox" name="reportType[]" value="' . htmlspecialchars($type['subqueId']) . '" class="form-checkbox" />
+                                   <span class="ml-2">' . htmlspecialchars($type['subqueName']) . '</span>
+                                  </label>&nbsp;&nbsp;&nbsp;&nbsp;';
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
+
             <!-- print success message -->
             <?php if (isset($successMsg)): ?>
                 <div class="mt-4 text-green-500"><?php echo $successMsg; ?></div>

@@ -19,39 +19,36 @@
         </div>
         <a href="dashboard.php" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-home w-5"></i> Dashboard</a>
         <!-- User Dropdown (Desktop) -->
-           <div class="relative group">
+        <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-user w-5"></i> create Division
+                <i class="fas fa-building w-5"></i> Create Division
                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
             </button>
             <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Division </a>
+                <a href="create-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Division</a>
                 <a href="list-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
-             <div class="relative group">
+        <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-user w-5"></i> create station
+                <i class="fas fa-train w-5"></i> Create Station
                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
             </button>
             <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create station</a>
+                <a href="create-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Station</a>
                 <a href="list-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
-
-         <div class="relative group">
+        <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-user w-5"></i> create organization
+                <i class="fas fa-sitemap w-5"></i> Create Organization
                 <i class="fas fa-chevron-down ml-1 text-xs"></i>
             </button>
             <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-organization.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create organization</a>
+                <a href="create-organization.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Organization</a>
                 <a href="list-organisation.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
             </div>
         </div>
-         
-         
         <div class="relative group">
             <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
                 <i class="fas fa-user w-5"></i> User
