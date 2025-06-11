@@ -33,8 +33,6 @@ if ($result && $row = $result->fetch_assoc()) {
     $overallAverage = $totalRecords > 0 ? round(($totalScore / ($totalRecords * 10)) * 100, 2) : 0;
 
     echo "<span>Overall Average:</span> $overallAverage% &nbsp;|&nbsp;";
-    echo "<span>Total Score Obtained:</span> $totalScore<br>";
-
     echo "<span>Total Weightage:</span> $totalweihgt<br>";
 } else {
     echo "No data found.";
