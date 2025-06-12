@@ -38,5 +38,40 @@ if ($result && $row = $result->fetch_assoc()) {
     echo "No data found.";
 }
 
+$sql ="SELECT 
+    (SELECT SUM(Bt.value)
+     FROM baris_target AS Bt
+     WHERE Bt.OrgID = 17
+       AND Bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+    ) AS total_target,
+
+    (SELECT 
+        SUM(bcr.db_surveyValue) AS total_survey_value
+     FROM baris_chemical_report AS bcr
+     INNER JOIN baris_report_weight brw 
+         ON bcr.db_surveySubQuestionId = brw.subqueId
+     WHERE bcr.OrgID = 17
+       AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+    ) AS total_survey_value,
+
+    (SELECT brw.weightage
+     FROM baris_chemical_report AS bcr
+     INNER JOIN baris_report_weight brw 
+         ON bcr.db_surveySubQuestionId = brw.subqueId
+     WHERE bcr.OrgID = 17
+       AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+     LIMIT 1
+    ) AS weightage;";
+$result = $conn->query($sql);
+$data = $result->fetch_assoc();
+$total_target = $data['total_target'] ?? 0;
+$total_survey_value = $data['total_survey_value'] ?? 0;
+
+ $weightage = $data['weightage'] ?? 0;
+ $cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
+echo "Cleanliness Record Percentage: $cleanlinessRecordPercentage%";
+
+
+
 $conn->close();
 ?>
