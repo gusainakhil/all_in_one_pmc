@@ -21,9 +21,15 @@
 .pmc-details {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+
 
   font-size: 12px;
+}
+.pmc-details p{
+  text-align: center;
+margin:auto;
+  
+
 }
 
 .pmc-table-wrapper {
@@ -34,13 +40,13 @@
 .pmc-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .pmc-table th,
 .pmc-table td {
   border: 1px solid #ccc;
-  padding: 4px;
+  padding: 3px;
   text-align: center;
   vertical-align: top;
 }

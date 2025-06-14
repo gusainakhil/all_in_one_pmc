@@ -5,7 +5,7 @@ session_start();
 if (!isset($_SESSION['OrgID'], $_SESSION['stationId'])) {
     die("Session data missing.");
 }
-$org_id = $_SESSION['OrgID'];
+$org_id = $_SESSION['OrgID'];   
 $station_id = $_SESSION['stationId'];
 
 // Reusable calculation function
@@ -207,23 +207,68 @@ $earnings_total = round($earnings_total, 2);
 $overallAverage = $overallAverage ?: 0;
 $consolidated_score = round($overallAverage, 2) . '%';
 
-$deductions = [ 
-    ['PASSENGER COMPLAINT', 0],
-    ['NON REMOVAL OF GARBAGE FROM DUSTBINS', 0],
-    ['OPEN BURNING OF WASTE IN RAILWAYS PREMISES', 0],
-    ['ROOF OF PLATFORM SHELTERS', 0],
-    ['MANPOWER AND UNIFORM PENALTY', 154912],
-    ['PENALTY IMPOSED BY NGT', 0],
-    ['SPOT PENALTY', 0],
-    ['PENALTY IMPOSED DUE TO MACHINE SHORTAGE/ OUT OF ORDER', 0],
-    ['PENALTY IMPOSED DUE TO SHORTAGE OF MACHINE CONSUMABLES', 9600],
-    ['PENALTY DUE TO NON AVAILABILITY OF CHEMICALS', 137850],
-    ['MONITORING EQUIPMENTS PENALTY', 0],
-    ['MISCELLANEOUS', 0],
-];
-$deductions_total = array_sum(array_column($deductions, 1));
+// Fetch all penalties for the selected period and org
+$sql = "SELECT penalty_amount, penalty_review FROM `baris_penalty` WHERE created_date BETWEEN '$firstDay' AND '$lastDay' AND OrgID = $org_id";
+$result = $conn->query($sql);
+
+$deductions = [];
+$deductions_total = 0;
+
+if ($result && $result->num_rows > 0) {
+    $sn = 1;
+    while ($row = $result->fetch_assoc()) {
+        $amount = $row['penalty_amount'] ?? 0;
+        $review = $row['penalty_review'] ?? '';
+        $deductions[] = [
+            'sn' => $sn++,
+            'amount' => $amount,
+            'deduction' => $review
+        ];
+        $deductions_total += $amount;
+    }
+} else {
+    // No penalties found, add a default row
+    $deductions[] = [
+        'sn' => 1,
+  
+        'amount' => 0,
+        'deduction' => ''
+    ];
+    $deductions_total = 0;
+}
+
 $total_payable = $earnings_total - $deductions_total;
 $total_payable_rounded = round($total_payable);
+
+// Deductions
+// The following block is removed to prevent overwriting the $deductions array with an incompatible structure.
+// $deductions = [
+//     [$penalty_review, $penalty_amount, ],
+//     // Add other deductions as needed, e.g.:
+//     // ['PASSENGER COMPLAINT', 0, ''],
+//     // ...
+// ];
+// $deductions_total = array_sum(array_column($deductions, 1));
+// $total_payable = $earnings_total - $deductions_total;
+// $total_payable_rounded = round($total_payable);
+// Deductions
+// $deductions = [
+//     ['PASSENGER COMPLAINT', 0],
+//     ['NON REMOVAL OF GARBAGE FROM DUSTBINS', 0],
+//     ['OPEN BURNING OF WASTE IN RAILWAYS PREMISES', 0],
+//     ['ROOF OF PLATFORM SHELTERS', 0],
+//     ['MANPOWER AND UNIFORM PENALTY', 154912],
+//     ['PENALTY IMPOSED BY NGT', 0],
+//     ['SPOT PENALTY', 0],
+//     ['PENALTY IMPOSED DUE TO MACHINE SHORTAGE/ OUT OF ORDER', 0],
+//     ['PENALTY IMPOSED DUE TO SHORTAGE OF MACHINE CONSUMABLES', 9600],
+//     ['PENALTY DUE TO NON AVAILABILITY OF CHEMICALS', 137850],
+//     ['MONITORING EQUIPMENTS PENALTY', 0],
+//     ['MISCELLANEOUS', 0],
+// ];
+// $deductions_total = array_sum(array_column($deductions, 1));
+// $total_payable = $earnings_total - $deductions_total;
+// $total_payable_rounded = round($total_payable);
 
 function numberToWords($number) {
     return class_exists('NumberFormatter')
@@ -255,10 +300,10 @@ function numberToWords($number) {
     <input type="submit" value="Filter">
 </form>
 
-<div style="text-align:center;">
+<!-- <div style="text-align:center;">
     <strong>Selected Date Range:</strong>
     <?= date('d.m.Y', strtotime($firstDay)) ?> TO <?= date('d.m.Y', strtotime($lastDay)) ?>
-</div>
+</div> -->
 
 <div class="container">
     <h3 style="text-align:center;">PMC BILL INVOICE</h3>
@@ -293,11 +338,27 @@ function numberToWords($number) {
 
     <div class="section"><strong>DEDUCTIONS</strong></div>
     <table>
-        <tr><th>S.NO</th><th>DEDUCTIONS</th><th>AMOUNT</th></tr>
-        <?php foreach ($deductions as $i => $row): ?>
-            <tr><td><?= $i+1 ?></td><td><?= htmlspecialchars($row[0]) ?></td><td><?= number_format($row[1], 2) ?></td></tr>
+        <tr>
+            <th>S.NO</th>
+            <th>DEDUCTION</th>
+            <th colspan="2">Amount</th>
+        </tr>
+
+        <?php foreach ($deductions as $row): ?>
+            <tr>
+                <td><?= $row['sn'] ?></td>
+                <td><?= htmlspecialchars($row['deduction']) ?></td>
+                <td colspan="2"><?= number_format($row['amount'], 2) ?></td>
+            </tr>
         <?php endforeach; ?>
-        <tr><th colspan="2">TOTAL</th><th><?= number_format($deductions_total, 2) ?></th></tr>
+        
+        
+        <tr>
+            <th colspan="2">TOTAL</th>
+            <!-- <th><?= number_format($deductions_total, 2) ?></th> -->
+            <th colspan="2"><?= numberToWords(round($deductions_total)) ?></th>
+          
+        </tr>
     </table>
 
     <div class="summary">

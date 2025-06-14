@@ -5,7 +5,8 @@ $selectedMonth = isset($_GET['month']) ? $_GET['month'] : date('m');
 $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
 $startDate = "$selectedYear-$selectedMonth-01";
-$endDate = date("Y-m-t", strtotime($startDate));
+// Set $endDate to the first second of the next month for inclusive date range
+$endDate = date("Y-m-01", strtotime("$selectedYear-$selectedMonth +1 month"));
 
 include "../../connection.php";
 ini_set('display_errors', 1);
@@ -25,11 +26,12 @@ $reportQuery = "
     JOIN 
         baris_division bd ON bs.DivisionId = bd.DivisionId
     JOIN 
-        baris_organization bg ON bd.OrgID = bg.OrgID
+        baris_organization bg ON bs.OrgId = bg.OrgId
     WHERE 
         dpl.db_surveyStationId = '$station_id'
-        AND dpl.created_date BETWEEN '$startDate' AND '$endDate';
+        AND dpl.created_date >= '$startDate' AND dpl.created_date < '$endDate';
 ";
+
 
 // Execute the query and check for errors
 $reportResult = $conn->query($reportQuery);

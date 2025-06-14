@@ -101,7 +101,7 @@ foreach ($dateRange as $dateObj) {
             WHERE 
                 DATE(bas.created_date) = '$currentDate' 
                 AND bas.db_surveyStationId = '$station_id'
-            ORDER BY bp.db_pagename, bap.paramName";
+           ORDER BY bas.db_surveyPageId ASC";
 
     $result = $conn->query($query);
 

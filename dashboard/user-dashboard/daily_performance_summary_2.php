@@ -108,9 +108,21 @@ $count_rows = 0;
         echo "<p><strong>Division:</strong> {$first_row['DivisionName']}</p>";
         echo "<p><strong>Station:</strong> {$first_row['stationName']}</p>";
         echo "<p><strong>Name Of Contractor:</strong> {$first_row['db_Orgname']}</p>";
-        $achievement_result->data_seek(0);
+        $achievement_result->data_seek(0);  
       } ?>
-      <p><strong>Average Final Score:</strong> <?= number_format($avg_final_score_raw, 2) ?>%</p>
+    
+    <p><strong>Monthly Final Score:</strong> <span id="monthly-final-score-display"></span></p>
+    <script>
+      // Get the value from the table's <td id="monthly-final-score">
+      document.addEventListener('DOMContentLoaded', function() {
+      var scoreTd = document.getElementById('monthly-final-score');
+      var displaySpan = document.getElementById('monthly-final-score-display');
+      if (scoreTd && displaySpan) {
+        displaySpan.textContent = scoreTd.textContent;
+      }
+      });
+    </script>
+
     </div>
 
     <div class="pmc-table-wrapper">
@@ -136,8 +148,20 @@ $count_rows = 0;
             $i = 1;
             while ($row = $achievement_result->fetch_assoc()):
               $pageId = $row['db_surveyPageId'];
-              $target = $targets[$pageId] ?? ['Monthly_target_Shift1' => 0, 'Monthly_target_Shift2' => 0, 'Monthly_target_Shift3' => 0];
+                $target = $targets[$pageId] ?? ['Monthly_target_Shift1' => 0, 'Monthly_target_Shift2' => 0, 'Monthly_target_Shift3' => 0];
 
+                // If any monthly shift target is zero, skip the calculation for which shift target is 0
+              if ($target['Monthly_target_Shift1'] == 0) {
+                  $row['Shift_1_Achievement'] = 0;
+              }
+              if ($target['Monthly_target_Shift2'] == 0) {
+                  $row['Shift_2_Achievement'] = 0;
+              }
+              if ($target['Monthly_target_Shift3'] == 0) {
+                  $row['Shift_3_Achievement'] = 0;
+              }
+
+              // Calculate final score and weightage achieved
               $target_total = $target['Monthly_target_Shift1'] + $target['Monthly_target_Shift2'] + $target['Monthly_target_Shift3'];
               $achieved_total = $row['Shift_1_Achievement'] + $row['Shift_2_Achievement'] + $row['Shift_3_Achievement'];
               $final_score = $target_total > 0 ? ($achieved_total / $target_total) * 100 : 0;
@@ -162,15 +186,19 @@ $count_rows = 0;
             <td><?= number_format($weightage_achieved, 2) ?>%</td>
           </tr>
           <?php endwhile; 
-            $avg_final_score = $total_weightage_achieved / $count_rows;
+            $avg_final_score = $total_weightage_achieved;
+
             $avg_final_score_raw = $total_final_score / $count_rows;
           endif; ?>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="10" style="text-align:right;"><strong>Average Final Score:</strong></td>
-            <td><strong><?= number_format($avg_final_score_raw, 2) ?>%</strong></td>
-            <td><strong><?= number_format($avg_final_score, 2) ?>%</strong></td>
+            <td colspan="10" style="text-align:right;"><strong>Monthly Final Score:</strong></td>
+            <!-- <td><strong><?= number_format($avg_final_score_raw, 2) ?>%</strong></td> -->
+        
+            <td colspan="2" id="monthly-final-score" style="text-align: center;"><strong><?= number_format($avg_final_score, 2) ?>%</strong></td>
+
+      
           </tr>
         </tfoot>
       </table>
