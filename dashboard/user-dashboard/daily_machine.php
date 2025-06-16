@@ -1,10 +1,10 @@
 <?php session_start();
 include "../../connection.php"; ?>
 <?php
-$_SESSION['machine_report_id'] = $_GET['id'];
-
-// Start the session
-session_start();
+// Check if 'id' is set in the URL
+if (isset($_GET['id'])) {
+    $_SESSION['machine_report_id'] = $_GET['id'];
+}
 
 // Check if userId is not set
 if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
@@ -236,11 +236,11 @@ $conn->close();
                         <div class="col-sm-6">
                             <h3 class="mb-0">Daily machine Report </h3>
                         </div>
-                        <div class="col-sm-6"> <a href="machinedailytarge.php" class="btn btn-success" target="blank">
+                        <div class="col-sm-6"> <a href="machinedailytarge.php" class="btn btn-success" target="_blank">
                                 Set Monthly Target</a>
-                            <a href="machine_summary_report.php?id=<?php echo $id ?>" class="btn btn-success"
-                                target="blank"> Summary</a>
-                            <a href="machine_report.php" target="blank" class="btn btn-success"> Machine Report</a>
+                            <a href="machine_summary_report.php?id=<?php echo $_SESSION['machine_report_id'] ?>" class="btn btn-success"
+                                target="_blank"> Summary</a>
+                            <a href="machine_report.php" target="_blank" class="btn btn-success"> Machine Report</a>
                         </div>
                     </div>
                     <center>
@@ -265,7 +265,7 @@ $conn->close();
                             <div class=" mb-4">
 
                                 <div class="body"
-                                    style="max-height: 80vh; overflow-y: auto; padding: 10px; border: 1px solid #ccc;">
+                                    style="max-height: 80vh; overflow-y: auto; padding: 10px;">
                                     <?php
 
                                     foreach ($data as $date => $params) {

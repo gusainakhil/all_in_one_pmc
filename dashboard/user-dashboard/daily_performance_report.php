@@ -44,20 +44,6 @@ $dateRange = new DatePeriod($start, $interval, $end);
     th { background-color: #f2f2f2; }
     .desc { text-align: left; }
  
-        .watermark {
-        position: fixed;
-        top: 50%;
-        left: 70%;
-        transform: translate(-90%, -90%)rotate(-30deg);
-        color: rgba(0, 0, 0, 0.1); /* Light gray, adjust as needed */
-        font-size: 70px;          /* Adjust size */
-       font-weight: 100rem;
-        z-index: -1;
-        pointer-events: none;
-        white-space: nowrap;
-        user-select: none;
-        opacity:0.1;
-    }
   </style>
 </head>
 <body>
@@ -160,7 +146,6 @@ foreach ($dateRange as $dateObj) {
   <strong>Station:</strong> <?= htmlspecialchars($station) ?> &nbsp;&nbsp;
   <strong>Contractor:</strong> <?= htmlspecialchars($contractor) ?>
 </div>
-<div class="watermark" >Beatle Analytics</div>
 
 <table>
   <thead>

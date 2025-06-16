@@ -53,50 +53,168 @@ $overallAverage = $data['total_records'] > 0 ? round(($data['total_score'] / ($d
 $totalWeight = $data['weightage'] ?? 0;
 $surpriseVisitAmount = calculatealreportAmount($bill['sactioned_amount'], $totalWeight, $firstDay);
 
-// calculate CLEANLINESS RECORD 
-$sql ="SELECT 
-    (
-        SELECT SUM(Bt.value)
-        FROM baris_target AS Bt
-        WHERE Bt.OrgID = 17
-          AND Bt.created_date BETWEEN '$firstDay' AND '$lastDay'
-          AND Bt.subqueId IN (
-              SELECT DISTINCT bcr.db_surveySubQuestionId
-              FROM baris_chemical_report AS bcr
-              WHERE bcr.OrgID = $org_id
-                AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-          )
-    ) AS total_target,
+// calculate chemiacl reord important for chemical report
+// $sql ="SELECT 
+//     (
+//         SELECT SUM(Bt.value)
+//         FROM baris_target AS Bt
+//         WHERE Bt.OrgID = 17
+//           AND Bt.created_date BETWEEN '$firstDay' AND '$lastDay'
+//           AND Bt.subqueId IN (
+//               SELECT DISTINCT bcr.db_surveySubQuestionId
+//               FROM baris_chemical_report AS bcr
+//               WHERE bcr.OrgID = $org_id
+//                 AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+//           )
+//     ) AS total_target,
 
-    (
-        SELECT 
-            SUM(bcr.db_surveyValue)
-        FROM baris_chemical_report AS bcr
-        INNER JOIN baris_report_weight brw 
-            ON bcr.db_surveySubQuestionId = brw.subqueId
-        WHERE bcr.OrgID = $org_id
-          AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-    ) AS total_survey_value,
+//     (
+//         SELECT 
+//             SUM(bcr.db_surveyValue)
+//         FROM baris_chemical_report AS bcr
+//         INNER JOIN baris_report_weight brw 
+//             ON bcr.db_surveySubQuestionId = brw.subqueId
+//         WHERE bcr.OrgID = $org_id
+//           AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+//     ) AS total_survey_value,
 
-    (
-        SELECT brw.weightage
-        FROM baris_chemical_report AS bcr
-        INNER JOIN baris_report_weight brw 
-            ON bcr.db_surveySubQuestionId = brw.subqueId
-        WHERE bcr.OrgID = $org_id
-          AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-        LIMIT 1
-    ) AS weightage;";
-$result = $conn->query($sql);
-$data = $result->fetch_assoc();
-$total_target = $data['total_target'] ?? 0;
-$total_survey_value = $data['total_survey_value'] ?? 0;
+//     (
+//         SELECT brw.weightage
+//         FROM baris_chemical_report AS bcr
+//         INNER JOIN baris_report_weight brw 
+//             ON bcr.db_surveySubQuestionId = brw.subqueId
+//         WHERE bcr.OrgID = $org_id
+//           AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+//         LIMIT 1
+//     ) AS weightage;";
+// $result = $conn->query($sql);
+// $data = $result->fetch_assoc();
+// $total_target = $data['total_target'] ?? 0;
+// $total_survey_value = $data['total_survey_value'] ?? 0;
 
-$weightage = $data['weightage'] ?? 0;
-$cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
-$cleanlinessrecordamount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
+// $weightage = $data['weightage'] ?? 0;
+// $cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
+// $cleanlinessrecordamount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
 //echo "Cleanliness Record Percentage: $cleanlinessRecordPercentage%";
 
+// CLEANLINESS RECORD /performane log
+
+
+// Sanitize & validate input
+function getParam($key, $default = '') {
+    return isset($_GET[$key]) ? htmlspecialchars(trim($_GET[$key])) : $default;
+}  
+$month     = (int) getParam('month', date('n'));
+$year      = (int) getParam('year', date('Y'));
+// $firstDay = sprintf("%04d-%02d-01", $year, $month);
+// $lastDay = date("Y-m-t", strtotime($startDate));
+// Auto-fetch subqueId from Daily_Performance_Log
+$subqueId = null;
+$subque_query = "
+    SELECT DISTINCT db_surveySubQuestionId
+    FROM Daily_Performance_Log 
+    WHERE db_surveyStationId = ?
+";
+$stmt = $conn->prepare($subque_query);
+$stmt->bind_param("i", $station_id);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($row = $result->fetch_assoc()) {
+    $subqueId = (int)$row['db_surveySubQuestionId'];
+}
+$stmt->close();
+
+if (!$subqueId) {
+    die("Subquestion ID not found for the given station and date range.");
+}
+
+
+
+// Fetch monthly targets
+$targets = [];
+$t_sql = "
+    SELECT pageId,
+           SUBSTRING_INDEX(value, ',', 1) AS t1,
+           SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 2), ',', -1) AS t2,
+           SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 3), ',', -1) AS t3
+    FROM baris_target
+    WHERE OrgID = ? AND month = ? AND subqueId = ?
+    ORDER BY id DESC
+    LIMIT 24
+";
+$stmt = $conn->prepare($t_sql);
+$stmt->bind_param("iii", $org_id, $month, $subqueId);
+$stmt->execute();
+$res = $stmt->get_result();
+while ($row = $res->fetch_assoc()) {
+    $targets[$row['pageId']] = [(float)$row['t1'], (float)$row['t2'], (float)$row['t3']];
+}
+$stmt->close();
+
+// Fetch achievements
+$score_sql = "
+    SELECT dpl.db_surveyPageId, brw.weightage as weiht,
+           SUBSTRING(bp2.db_pageChoice2, INSTR(bp2.db_pageChoice2, '@') + 1) AS weightage,
+           SUM(CASE WHEN bp1.paramName='Shift 1' THEN dpl.db_surveyValue ELSE 0 END) AS a1,
+           SUM(CASE WHEN bp1.paramName='Shift 2' THEN dpl.db_surveyValue ELSE 0 END) AS a2,
+           SUM(CASE WHEN bp1.paramName='Shift 3' THEN dpl.db_surveyValue ELSE 0 END) AS a3
+    FROM Daily_Performance_Log dpl
+    JOIN baris_param bp1 ON dpl.db_surveyParamId = bp1.paramId
+    JOIN baris_page bp2 ON dpl.db_surveyPageId = bp2.pageId
+    JOIN baris_report_weight brw ON dpl.db_surveySubQuestionId = brw.subqueId
+
+    WHERE dpl.db_surveyStationId = ? AND dpl.created_date BETWEEN ? AND ?
+    GROUP BY dpl.db_surveyPageId
+";
+
+$stmt = $conn->prepare($score_sql);
+$stmt->bind_param("iss", $station_id, $firstDay, $lastDay);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$total_weightage = 0;
+while ($row = $result->fetch_assoc()) {
+    $weightagec = $row['weiht'] ?? 0;
+   
+    $pageId = $row['db_surveyPageId'];
+    $target = $targets[$pageId] ?? [0, 0, 0];
+
+    $target_sum = $target[0] + $target[1] + $target[2];
+    $achieved_sum = 
+        ($target[0] > 0 ? $row['a1'] : 0) +
+        ($target[1] > 0 ? $row['a2'] : 0) +
+        ($target[2] > 0 ? $row['a3'] : 0);
+
+    $final_score = $target_sum > 0 ? ($achieved_sum / $target_sum) * 100 : 0;
+    $weightage = (float)$row['weightage'];
+    $weightage_achieved = ($final_score * $weightage) / 100;
+
+    $total_weightage += $weightage_achieved;
+}
+// $stmt->close();
+
+
+
+ echo $total_weightage;
+
+
+function calculatePerformanceConsumablesAmount($sactioned_amount, $weightagec, $firstDay) {
+    if ($sactioned_amount <= 0 || $weightagec <= 0) {
+        return 0;
+    }
+    $weightedAmount = ($sactioned_amount * $weightagec) / 100;
+    $totalDaysInFourYears = 1461; // Includes 1 leap year (366 + 365*3)
+    $perDayAmount = $weightedAmount / $totalDaysInFourYears;
+    $daysInMonth = date('t', strtotime($firstDay)); // Days in the month
+    return round($perDayAmount * $daysInMonth, 2);
+}
+$performanceConsumablesAmount = calculatePerformanceConsumablesAmount($bill['sactioned_amount'], $weightagec, $firstDay);
+echo "Performance Amount: $performanceConsumablesAmount";
+
+
+
+
+    
 
 //calculate MACHINE USAGE
 
@@ -187,14 +305,10 @@ $attendancePercentage = $total_target > 0 ? round(($total_survey_value / $total_
 $attendanceAmount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
 //echo "Attendance Percentage: $attendancePercentage%";
 
-
-
-
-
 // Earnings & Deductions
 $earnings = [
     ['ATTENDANCE RECORDS OF THE STAFF', "$weightage%", "$attendancePercentage%", "$attendanceAmount"],
-    ['CLEANLINESS RECORD', "$weightage%", "$cleanlinessRecordPercentage", "$cleanlinessrecordamount"],
+    ['CLEANLINESS RECORD', "0", "0", "0"],
     ['USE OF TYPE AND QUANTITY OF CONSUMABLES', "0", "0", "0"],
     ['MACHINERY USAGE',"$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
     ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "$totalWeight%", "$overallAverage%", "$surpriseVisitAmount"],

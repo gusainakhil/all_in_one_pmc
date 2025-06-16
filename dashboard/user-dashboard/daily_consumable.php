@@ -2,8 +2,10 @@
 session_start();
 include "../../connection.php";
 
+if($_GET['id'] == '' || !isset($_GET['id'])) {
 
- $_SESSION['id'] = $_GET['id'];
+}
+
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

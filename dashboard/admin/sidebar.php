@@ -1,112 +1,173 @@
-<!-- Sidebar for desktop -->
-<style>
-    body {
-        /* font-weight:400; */
-        font-size: 16px;
-        font-variant: small-caps;
-        /* font-family: "Times New Roman", Times, serif; */
-    }
-</style>
-<aside class="w-64 bg-white shadow-lg hidden md:block">
-    <!-- <div class="p-4 text-lg font-semibold border-b">Dashboard</div> -->
-    <center><img src="https://pa.beatlebuddy.com/assets/railway_logo.jpg" alt="Logo" class="w-40 h-30 mr-2 center-block" style="padding: 8px;"></center>
-    <hr>
-    <nav class="p-4 space-y-2">
-        <!-- logo -->
-        <div class="flex items-center mb-4">
-            <img src="https://pa.beatlebuddy.com/assets/railway_logo.jpg" alt="Logo" class="w-10 h-10 mr-2">
-            <span class="text-xl font-bold">Beatle Analytics</span>
-        </div>
-         <hr>
-        <a href="dashboard.php" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-home w-5"></i> Dashboard</a>
-         <hr>
-        <!-- User Dropdown (Desktop) -->
-        <div class="relative group">
-            <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-building w-5"></i> Create Division
-                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </button>
-            <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Division</a>
-                <a href="list-division.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
+
+<aside class="w-72 bg-gray-900 text-white h-screen overflow-y-auto fixed left-0 top-0 transition-all duration-300 ease-in-out" id="sidebar">
+    <!-- Logo & Brand -->
+    <div class="flex items-center justify-between p-4 border-b border-gray-800">
+        <div class="flex items-center space-x-3">
+            <img src="https://pa.beatlebuddy.com/assets/railway_logo.jpg" alt="Logo" class="w-10 h-10 rounded-lg">
+            <div>
+                <h1 class="font-bold text-xl">Beatle Analytics</h1>
+                <p class="text-xs text-gray-400">Station Cleaning Dashboard</p>
             </div>
         </div>
-         <hr>
-        <div class="relative group">
-            <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-train w-5"></i> Create Station
-                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </button>
-            <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Station</a>
-                <a href="list-station.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
-            </div>
+        <button id="collapse-btn" class="text-gray-400 hover:text-white md:hidden">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+    
+    <!-- User Profile -->
+    <div class="flex items-center p-4 border-b border-gray-800">
+        <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
+            <span class="font-bold text-white">A</span>
         </div>
-         <hr>
-        <div class="relative group">
-            <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-sitemap w-5"></i> Create Organization
-                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </button>
-            <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="create-organization.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create Organization</a>
-                <a href="list-organisation.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">List</a>
-            </div>
+        <div>
+            <p class="font-medium">Admin User</p>
+            <p class="text-xs text-gray-400">Administrator</p>
         </div>
-        <hr>
-        <div class="relative group">
-            <button type="button" class="flex items-center gap-2 text-gray-700 hover:text-blue-600 focus:outline-none">
-                <i class="fas fa-user w-5"></i> User
-                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </button>
-            <div class="absolute left-0 mt-1 w-40 bg-white border rounded shadow-lg hidden group-hover:block group-focus-within:block z-10">
-                <a href="user-list.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Show Users</a>
-                <a href="create-user.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Create User</a>
-            </div>
-        </div>
-         <hr>
-        <!-- <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-layer-group w-5"></i> Type</a> -->
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase mb-4 mt-2">Main Navigation</p>
         
+        <a href="dashboard.php" class="flex items-center p-3 mb-2 rounded-lg bg-blue-600 text-white">
+            <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+            <span>Dashboard</span>
+        </a>
+        
+        <div class="mb-2">
+            <button class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-building w-5 mr-3"></i>
+                    <span>Divisions</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div class="pl-12 mt-1 space-y-1">
+                <a href="create-division.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Division
+                </a>
+                <a href="list-division.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    View Divisions
+                </a>
+            </div>
+        </div>
+        
+        <div class="mb-2">
+            <button class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-train w-5 mr-3"></i>
+                    <span>Stations</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div class="pl-12 mt-1 space-y-1">
+                <a href="create-station.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Station
+                </a>
+                <a href="list-station.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    View Stations
+                </a>
+            </div>
+        </div>
+        
+        <div class="mb-2">
+            <button class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-sitemap w-5 mr-3"></i>
+                    <span>Organizations</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div class="pl-12 mt-1 space-y-1">
+                <a href="create-organization.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Organization
+                </a>
+                <a href="list-organisation.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    View Organizations
+                </a>
+            </div>
+        </div>
+        
+        <div class="mb-2">
+            <button class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-user w-5 mr-3"></i>
+                    <span>Users</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div class="pl-12 mt-1 space-y-1">
+                <a href="user-list.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    View Users
+                </a>
+                <a href="create-user.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create User
+                </a>
+            </div>
+        </div>
+        
+        <p class="text-xs font-bold text-gray-400 uppercase mb-4 mt-8">Other</p>
+        
+        <a href="#" class="flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800 transition-colors">
+            <i class="fas fa-cog w-5 mr-3"></i>
+            <span>Settings</span>
+        </a>
+        
+        <a href="#" class="flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800 transition-colors">
+            <i class="fas fa-question-circle w-5 mr-3"></i>
+            <span>Help & Support</span>
+        </a>
+        
+        <a href="#" class="flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800 transition-colors">
+            <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+            <span>Logout</span>
+        </a>
     </nav>
 </aside>
 
-<!-- Sidebar for mobile -->
-<div class="md:hidden">
-    <button id="mobile-menu-btn" class="p-4 focus:outline-none">
-        <i class="fas fa-bars text-2xl"></i>
+<!-- Mobile menu button -->
+<div class="fixed bottom-4 right-4 md:hidden z-50">
+    <button id="mobile-menu-toggle" class="bg-blue-600 text-white p-3 rounded-full shadow-lg">
+        <i class="fas fa-bars"></i>
     </button>
-    <div id="mobile-sidebar" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden">
-        <aside class="w-64 bg-white h-full shadow-lg p-4">
-            <div class="flex justify-between items-center border-b pb-4 mb-4">
-                <span class="text-lg font-semibold">Dashboard</span>
-                <button id="close-mobile-sidebar" class="text-gray-600 text-2xl focus:outline-none">&times;</button>
-            </div>
-            <nav class="space-y-2">
-                <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-home w-5"></i> Dashboard</a>
-                <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-user w-5"></i> User</a>
-                <a href="#" class="flex items-center gap-2 text-gray-700 hover:text-blue-600"><i class="fas fa-layer-group w-5"></i> Type</a>
-            </nav>
-        </aside>
-    </div>
 </div>
 
 <script>
-    const menuBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.getElementById('mobile-sidebar');
-    const closeBtn = document.getElementById('close-mobile-sidebar');
-
-    menuBtn.addEventListener('click', () => {
-        sidebar.classList.remove('hidden');
+    // Handle sidebar toggle for mobile
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('collapse-btn');
+    
+    mobileMenuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
     });
-
-    closeBtn.addEventListener('click', () => {
-        sidebar.classList.add('hidden');
+    
+    collapseBtn.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
     });
-
-    // Optional: close sidebar when clicking outside
-    sidebar.addEventListener('click', (e) => {
-        if (e.target === sidebar) {
-            sidebar.classList.add('hidden');
-        }
+    
+    // Add active class to menu items when clicked
+    const menuItems = document.querySelectorAll('nav a, nav button');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // If it's a submenu button, just toggle its dropdown
+            if (this.nextElementSibling && this.nextElementSibling.classList.contains('pl-12')) {
+                this.nextElementSibling.classList.toggle('hidden');
+                return;
+            }
+            
+            // Otherwise, set this as active
+            menuItems.forEach(el => {
+                if (el.classList.contains('bg-blue-600')) {
+                    el.classList.remove('bg-blue-600', 'text-white');
+                    el.classList.add('hover:bg-gray-800');
+                }
+            });
+            
+            if (!this.classList.contains('block')) {
+                this.classList.add('bg-blue-600', 'text-white');
+                this.classList.remove('hover:bg-gray-800');
+            }
+        });
     });
 </script>

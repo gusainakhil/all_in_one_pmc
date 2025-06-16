@@ -1,77 +1,103 @@
 <?php
-include "../../connection.php";
-session_start();
-if (!isset($_SESSION['stationId'])) {
-    die("Station ID not set in session.");
+require_once '../../connection.php'; // secure include
+
+// Sanitize & validate input
+function getParam($key, $default = '') {
+    return isset($_GET[$key]) ? htmlspecialchars(trim($_GET[$key])) : $default;
 }
 
-$startDate = isset($_GET['from_date']) ? $_GET['from_date'] : date('2025-01-01');
-$endDate = isset($_GET['to_date']) ? $_GET['to_date'] : date('2025-01-31');
-$station_id = $_SESSION['stationId'];
+$stationId = 44;
+$OrgID     = 42;     
 
-$sql = "
-    SELECT 
-        SUM(bas.db_surveyValue) AS total_score,
-        COUNT(bas.db_surveyValue) AS total_records,
-        brw.weightage AS weightage
-    FROM 
-        baris_param bap
-        INNER JOIN baris_survey bas ON bap.paramId = bas.db_surveyParamId
-        INNER JOIN baris_page bp ON bas.db_surveyPageId = bp.pageId
-        INNER JOIN baris_report_weight brw ON bas.db_surveySubQuestionId  = brw.subqueId
-    WHERE  
-        bas.db_surveyStationId = '$station_id' 
-        AND DATE(bas.created_date) BETWEEN '$startDate' AND '$endDate'
-";      
+$month     = (int) getParam('month', date('n'));
+$year      = (int) getParam('year', date('Y'));
+$startDate = sprintf("%04d-%02d-01", $year, $month);
+$endDate = date("Y-m-t", strtotime($startDate));
 
-$result = $conn->query($sql);
+// Auto-fetch subqueId from Daily_Performance_Log
+$subqueId = null;
+$subque_query = "
+    SELECT DISTINCT db_surveySubQuestionId
+    FROM Daily_Performance_Log 
+    WHERE db_surveyStationId = ?
+      AND created_date BETWEEN ? AND ?
+    LIMIT 1
+";
+$stmt = $conn->prepare($subque_query);
+$stmt->bind_param("iss", $stationId, $startDate, $endDate);
+$stmt->execute();
+$result = $stmt->get_result();
+if ($row = $result->fetch_assoc()) {
+    $subqueId = (int)$row['db_surveySubQuestionId'];
+}
+$stmt->close();
 
-if ($result && $row = $result->fetch_assoc()) {
-    $totalScore = $row['total_score'];
-    $totalRecords = $row['total_records'];
-     $totalweihgt = $row['weightage'];
-    $overallAverage = $totalRecords > 0 ? round(($totalScore / ($totalRecords * 10)) * 100, 2) : 0;
-
-    echo "<span>Overall Average:</span> $overallAverage% &nbsp;|&nbsp;";
-    echo "<span>Total Weightage:</span> $totalweihgt<br>";
-} else {
-    echo "No data found.";
+if (!$subqueId) {
+    die("❌ Subquestion ID not found for the given station and date range.");
 }
 
-$sql ="SELECT 
-    (SELECT SUM(Bt.value)
-     FROM baris_target AS Bt
-     WHERE Bt.OrgID = 17
-       AND Bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-    ) AS total_target,
-
-    (SELECT 
-        SUM(bcr.db_surveyValue) AS total_survey_value
-     FROM baris_chemical_report AS bcr
-     INNER JOIN baris_report_weight brw 
-         ON bcr.db_surveySubQuestionId = brw.subqueId
-     WHERE bcr.OrgID = 17
-       AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-    ) AS total_survey_value,
-
-    (SELECT brw.weightage
-     FROM baris_chemical_report AS bcr
-     INNER JOIN baris_report_weight brw 
-         ON bcr.db_surveySubQuestionId = brw.subqueId
-     WHERE bcr.OrgID = 17
-       AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-     LIMIT 1
-    ) AS weightage;";
-$result = $conn->query($sql);
-$data = $result->fetch_assoc();
-$total_target = $data['total_target'] ?? 0;
-$total_survey_value = $data['total_survey_value'] ?? 0;
-
- $weightage = $data['weightage'] ?? 0;
- $cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
-echo "Cleanliness Record Percentage: $cleanlinessRecordPercentage%";
 
 
+// Fetch monthly targets
+$targets = [];
+$t_sql = "
+    SELECT pageId,
+           SUBSTRING_INDEX(value, ',', 1) AS t1,
+           SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 2), ',', -1) AS t2,
+           SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 3), ',', -1) AS t3
+    FROM baris_target
+    WHERE OrgID = ? AND month = ? AND subqueId = ?
+    ORDER BY id DESC
+    LIMIT 24
+";
+$stmt = $conn->prepare($t_sql);
+$stmt->bind_param("iii", $OrgID, $month, $subqueId);
+$stmt->execute();
+$res = $stmt->get_result();
+while ($row = $res->fetch_assoc()) {
+    $targets[$row['pageId']] = [(float)$row['t1'], (float)$row['t2'], (float)$row['t3']];
+}
+$stmt->close();
 
-$conn->close();
+// Fetch achievements
+$score_sql = "
+    SELECT dpl.db_surveyPageId,
+           SUBSTRING(bp2.db_pageChoice2, INSTR(bp2.db_pageChoice2, '@') + 1) AS weightage,
+           SUM(CASE WHEN bp1.paramName='Shift 1' THEN dpl.db_surveyValue ELSE 0 END) AS a1,
+           SUM(CASE WHEN bp1.paramName='Shift 2' THEN dpl.db_surveyValue ELSE 0 END) AS a2,
+           SUM(CASE WHEN bp1.paramName='Shift 3' THEN dpl.db_surveyValue ELSE 0 END) AS a3
+    FROM Daily_Performance_Log dpl
+    JOIN baris_param bp1 ON dpl.db_surveyParamId = bp1.paramId
+    JOIN baris_page bp2 ON dpl.db_surveyPageId = bp2.pageId
+    WHERE dpl.db_surveyStationId = ? AND dpl.created_date BETWEEN ? AND ?
+    GROUP BY dpl.db_surveyPageId
+";
+
+$stmt = $conn->prepare($score_sql);
+$stmt->bind_param("iss", $stationId, $startDate, $endDate);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$total_weightage = 0;
+while ($row = $result->fetch_assoc()) {
+    $pageId = $row['db_surveyPageId'];
+    $target = $targets[$pageId] ?? [0, 0, 0];
+
+    $target_sum = $target[0] + $target[1] + $target[2];
+    $achieved_sum = 
+        ($target[0] > 0 ? $row['a1'] : 0) +
+        ($target[1] > 0 ? $row['a2'] : 0) +
+        ($target[2] > 0 ? $row['a3'] : 0);
+
+    $final_score = $target_sum > 0 ? ($achieved_sum / $target_sum) * 100 : 0;
+    $weightage = (float)$row['weightage'];
+    $weightage_achieved = ($final_score * $weightage) / 100;
+
+    $total_weightage += $weightage_achieved;
+}
+$stmt->close();
 ?>
+
+
+    <p><?= number_format($total_weightage, 2) ?>%</p>
+

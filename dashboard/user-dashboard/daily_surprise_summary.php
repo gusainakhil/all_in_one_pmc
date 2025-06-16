@@ -11,7 +11,8 @@ $selectedYear = isset($_GET['year']) ? $_GET['year'] : date('Y');
 $station_id = $_SESSION['stationId'];
 // Start and end date for the selected month
 $startDate = "$selectedYear-$selectedMonth-01";
-$endDate = date("Y-m-t", strtotime($startDate));
+$endDate = date("Y-m-t 23:59:59", strtotime($startDate));
+
 
 $sql = "
     SELECT 

@@ -40,13 +40,14 @@ $period = new DatePeriod(
 
     .railway-report-subtitle {
         text-align: center;
+        font-weight: bold;
         
     }
 
     .railway-section-title {
         text-align: center;
         font-weight: bold;
-        font-size:14px;
+        font-size:12px;
         
     }
 
@@ -133,7 +134,7 @@ $period = new DatePeriod(
         value="<?php echo isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-t'); ?>">
     <input type="hidden" name="station_id" value="<?php echo htmlspecialchars($station_id); ?>">
     <button type="submit">Go</button>
-     <button type="submit"><a   href="daily_surprise_summary.php" target="blank" style="text-decoration:none; color:white;"; >summary</a></button>
+     <a href="daily_surprise_summary.php" target="_blank" style="text-decoration:none; color:white; background-color:green; padding:8px 12px; border-radius:5px; border:none; font-size:14px; display:inline-block;">summary</a>
 </form>
 <br>
 <div class="railway-frame">
@@ -201,8 +202,8 @@ foreach ($period as $dateObj) {
         $result->data_seek(0);
 
        echo "<div class='railway-container'>";
-    echo "<h2 class='railway-report-title'>SOUTH CENTRAL RAILWAY</h2>";
-echo "<h4 class='railway-report-subtitle'>Daily Surprise Visit</h4>";
+    echo "<h4 class='railway-report-title'>SOUTH CENTRAL RAILWAY</h4>";
+echo "<h6 class='railway-report-subtitle'>Daily Surprise Visit</h4>";
 
         echo "<p class='railway-report-subtitle'>
             <span>Date:</span> $date &nbsp;|&nbsp;
@@ -243,9 +244,24 @@ echo "<h4 class='railway-report-subtitle'>Daily Surprise Visit</h4>";
                 <td>" . $row['Quality_of_done_work'] . "</td>
                 <td>" . $row['payable_grade'] . "</td>
             </tr>";
+            
+           
         }
         echo "</table>";
-        echo "</div>";
+        echo "
+       
+            <div style='text-align: center; font-weight: bold; margin: 15px 0;'>
+                <div style='display: flex; justify-content: space-around; margin-bottom: 10px;'>
+                    <div>Signature of Contractor Representative</div>
+                    <div>SCHI IN Charge</div>
+                </div>
+                <div style='display: flex; justify-content: space-around; margin-top: 10px;'>
+                    <div style='border-top: 1px solid #ccc; width: 30%; max-width: 200px;'></div>
+                    <div style='border-top: 1px solid #ccc; width: 30%; max-width: 200px;'></div>
+                </div>
+            </div>";
+        echo "</div>  <br>";
+      
     }
 }
 $conn->close();
