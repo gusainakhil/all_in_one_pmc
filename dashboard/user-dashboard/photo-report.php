@@ -1,15 +1,20 @@
-<?php session_start(); 
- include"../../connection.php";?>
+<?php 
+session_start(); 
+include "../../connection.php"; 
+?>
 <!doctype html>
 <html lang="en">
-  <?php
-  include"head.php";
+<?php
+include "head.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+// Get filter values
 $startDate = isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01');
 $endDate = isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-t');
 $station_id = $_SESSION['stationId'];
+
 $period = new DatePeriod(
     new DateTime($startDate),
     new DateInterval('P1D'),
@@ -17,138 +22,181 @@ $period = new DatePeriod(
 );
 ?>
 <head>
-    <title>photo report </title>
-<style>
-    .railway-frame {
-        height: 90vh;
-        overflow-y: auto;
-         font-size:11px;
-         font-weight:400;
-        box-sizing: border-box;
-    }
-
-    .railway-container {
-        width: 95%;
-        margin: auto;
-        page-break-after: always;
-    }
-
-    .railway-report-title {
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .railway-report-subtitle {
-        text-align: center;
-        
-    }
-
-    .railway-section-title {
-        text-align: center;
-        font-weight: bold;
-        font-size:14px;
-        
-    }
-
-    .railway-table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .railway-table, .railway-table th, .railway-table td {
-        border: 1px solid black;
-        text-align: center;
-    }
-
-    .railway-table th {
-        background-color: #f2f2f2;
-    }
-    .railway-table th:nth-child(1) { width: 5%; }   
-    .railway-table th:nth-child(2) { width: 30%; } 
-    .railway-table th:nth-child(3) { width: 20%; }  
-    .railway-table th:nth-child(4) { width: 10%; } 
-    .railway-table th:nth-child(5) { width: 10%; }  
-    .railway-table th:nth-child(6) { width: 10%; }
-    .railway-filter-form {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-        margin: 4px auto;
-        width: fit-content;
-        flex-wrap: wrap;
-    }
-    .railway-filter-form label {
-        font-weight: 500;
-        margin-right: 5px;
-    }
-    
-    
-    .railway-filter-form input[type="date"],
-    .railway-filter-form button {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-    .railway-filter-form select {
-        padding: 8px 12px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-    
-    .railway-filter-form button {
-        background-color: green;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-    /*.railway-filter-form button:hover {*/
-    /*    background-color: green;*/
-    /*}*/
-    /* Print styles */
-    
-</style>
+    <title>Before/After Photo Report</title>
+    <style>
+        .railway-frame {
+            height: 90vh;
+            overflow-y: auto;
+            font-size: 12px;
+            font-weight: 400;
+            box-sizing: border-box;
+        }
+        .railway-container {
+            width: 95%;
+            margin: auto;
+            page-break-after: always;
+        }
+        .railway-section-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0 10px;
+            text-transform: uppercase;
+        }
+        .photo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .photo-table th,
+        .photo-table td {
+            border: 1px solid #000;
+            vertical-align: top;
+            padding: 10px;
+            text-align: center;
+        }
+        .photo-table th {
+            background-color: #f2f2f2;
+            font-size: 14px;
+        }
+        .photo-img {
+            max-width: 100%;
+            width: 280px;
+            height: auto;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+        }
+        .photo-info {
+            font-size: 12px;
+            text-align: left;
+            margin-top: 5px;
+        }
+        .railway-filter-form {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 15px auto;
+            width: fit-content;
+        }
+        .railway-filter-form label {
+            font-weight: 500;
+        }
+        .railway-filter-form input[type="date"],
+        .railway-filter-form button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .railway-filter-form button {
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
-  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-    <div class="app-wrapper">
-     <?php include"header.php"?>
-      <main class="app-main">
-        
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+<div class="app-wrapper">
+    <?php include "header.php"; ?>
+    <main class="app-main">
         <form class="railway-filter-form" method="GET">
-           
-            <select>
-                <option>select Auditor</option>
-                
-            </select>
-            
-    <label for="from_date">From:</label>
-    <input type="date" name="from_date" id="from_date"
-        value="<?php echo isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01'); ?>">
-    <label for="to_date">To:</label>
-    <input type="date" name="to_date" id="to_date"
-        value="<?php echo isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-t'); ?>">
-    <input type="hidden" name="station_id" value="<?php echo htmlspecialchars($station_id); ?>">
-    <button type="submit">Go</button>
-     <button type="submit"><a   href="daily_surprise_summary.php" target="blank" style="text-decoration:none; color:white;"; >summary</a></button>
-</form>
-<?php echo $_SESSION['stationName'] ?>
-<br>
-<div class="railway-frame">
+            <label for="from_date">From:</label>
+            <input type="date" name="from_date" id="from_date" value="<?= $startDate; ?>">
+            <label for="to_date">To:</label>
+            <input type="date" name="to_date" id="to_date" value="<?= $endDate; ?>">
+            <input type="hidden" name="station_id" value="<?= htmlspecialchars($station_id); ?>">
+            <button type="submit">Go</button>
+        </form>
 
-</div>
-      </main>
-      <footer class="app-footer">
+        <div style="text-align:center;"><strong>Station:</strong> <?= $_SESSION['stationName']; ?></div>
+        <br>
+
+        <div class="railway-frame">
+            <?php
+            foreach ($period as $date) {
+                $currentDate = $date->format("Y-m-d");
+
+                // Fetch before photos
+                $beforeQuery = "SELECT * FROM baris_pictures 
+                                WHERE DATE(created_date) = '$currentDate' 
+                                AND db_surveyStationId = '$station_id' 
+                                AND photo_type = 'before' 
+                                ORDER BY created_date";
+                $beforeResult = $conn->query($beforeQuery);
+
+                // Fetch after photos
+                $afterQuery = "SELECT * FROM baris_pictures 
+                               WHERE DATE(created_date) = '$currentDate' 
+                               AND db_surveyStationId = '$station_id' 
+                               AND photo_type = 'after' 
+                               ORDER BY created_date";
+                $afterResult = $conn->query($afterQuery);
+
+                if (($beforeResult && $beforeResult->num_rows > 0) || ($afterResult && $afterResult->num_rows > 0)) {
+                    echo '<div class="railway-container">';
+                    echo "<div class='railway-section-title'>Before / After Photo Report - " . date('d-m-Y', strtotime($currentDate)) . "</div>";
+                    echo '<table class="photo-table">
+                            <tr>
+                                <th>Before Photo</th>
+                                <th>After Photo</th>
+                            </tr>';
+
+                    $maxRows = max($beforeResult->num_rows, $afterResult->num_rows);
+
+                    for ($i = 0; $i < $maxRows; $i++) {
+                        $beforeRow = $beforeResult->fetch_assoc();
+                        $afterRow = $afterResult->fetch_assoc();
+
+                        echo "<tr>";
+
+                        // Before Photo
+                        echo "<td>";
+                        if ($beforeRow) {
+                            $beforeImg = !empty($beforeRow['imagename']) ? "../../uploads/photos/" . $beforeRow['imagename'] : "../../uploads/photos/no-image.jpg";
+                            echo "<img src='$beforeImg' class='photo-img'>";
+                            echo "<div class='photo-info'>";
+                            echo "<strong>User ID:</strong> {$beforeRow['db_surveyUserid']}<br>";
+                            echo "<strong>Process:</strong> {$beforeRow['db_process_type']}<br>";
+                            echo "<strong>Remark:</strong> {$beforeRow['remarks']}<br>";
+                            echo "<strong>Time:</strong> " . date('H:i', strtotime($beforeRow['created_date']));
+                            echo "</div>";
+                        } else {
+                            echo "No data";
+                        }
+                        echo "</td>";
+
+                        // After Photo
+                        echo "<td>";
+                        if ($afterRow) {
+                            $afterImg = !empty($afterRow['imagename']) ? "../../uploads/photos/" . $afterRow['imagename'] : "../../uploads/photos/no-image.jpg";
+                            echo "<img src='$afterImg' class='photo-img'>";
+                            echo "<div class='photo-info'>";
+                            echo "<strong>User ID:</strong> {$afterRow['db_surveyUserid']}<br>";
+                            echo "<strong>Process:</strong> {$afterRow['db_process_type']}<br>";
+                            echo "<strong>Remark:</strong> {$afterRow['remarks']}<br>";
+                            echo "<strong>Time:</strong> " . date('H:i', strtotime($afterRow['created_date']));
+                            echo "</div>";
+                        } else {
+                            echo "No data";
+                        }
+                        echo "</td>";
+
+                        echo "</tr>";
+                    }
+
+                    echo "</table>";
+                    echo "</div>";
+                }
+            }
+            ?>
+        </div>
+    </main>
+    <footer class="app-footer">
         <div class="float-end d-none d-sm-inline">Anything you want</div>
-        <strong>
-          Copyright &copy; 2025&nbsp;
-          <a href="#" class="text-decoration-none"></a>.
-        </strong>
-        All rights reserved.
-      </footer>
-    </div>
-  </body>
+        <strong>&copy; 2025</strong> All rights reserved.
+    </footer>
+</div>
+</body>
 </html>

@@ -8,7 +8,7 @@ class Station {
     }
 
     public function getStationNameById($stationId) {
-        $query = "SELECT stationName , 	db_questionsId FROM {$this->table} WHERE 	db_stLoginId = ?";
+        $query = "SELECT stationName , stationId , 	db_questionsId FROM {$this->table} WHERE 	db_stLoginId = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->execute([$stationId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);

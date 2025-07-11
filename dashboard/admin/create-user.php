@@ -1,54 +1,104 @@
 <?php
-
 session_start();
-
 include "../../connection.php";
-// Check if the connection was successful
+
+// Show all errors during development
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Check database connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-// add user in database
+
+// Handle POST request
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Your POST handling code here
+    // Retrieve and sanitize inputs
     $db_userLoginName = $_POST['db_userLoginName'];
-    $db_username = $_POST['db_username'];
-    // Hash the password before storing
-    $db_password = password_hash($_POST['db_password'], PASSWORD_DEFAULT);
-    $db_phone = $_POST['db_phone'];
-    $db_email = $_POST['db_email'];
-    $db_usertype = $_POST['db_usertype'];
-    $db_designation = $_POST['db_designation'];
-    $reportType = $_POST['reportType'];
-    $OrgID = $_POST['OrgID'];
-    $DivisionId = $_POST['DivisionId'];
-    $StationId = $_POST['StationId'];
-    $db_valid_from = $_POST['db_valid_from'];
-    $db_valid = $_POST['db_valid'];
-    $paid_amount = $_POST['paid_amount'];
-    $gst_amount = $_POST['gst_amount'];
-    $total_paid_amount = $_POST['total_paid_amount'];
-    $renewal_amount = $_POST['renewal_amount'];
-    $renewal_gst_amount = $_POST['renewal_gst_amount'];
-    $renewal_total_amount = $_POST['renewal_total_amount'];
-    $login_token = $_POST['login_token'];
+    $db_username      = $_POST['db_username'];
+    $db_password      = password_hash($_POST['db_password'], PASSWORD_DEFAULT); // Secure hash
+    $db_phone         = $_POST['db_phone'];
+    $db_email         = $_POST['db_email'];
+    $db_usertype      = $_POST['db_usertype'];
+    $db_designation   = $_POST['db_designation'];
+    $reportType       = $_POST['reportType'];
+    $OrgID            = (int) $_POST['OrgID'];
+    $DivisionId       = (int) $_POST['DivisionId'];
+    $StationId        = (int) $_POST['StationId'];
+    $db_valid_from    = $_POST['db_valid_from'];
+    $db_valid         = $_POST['db_valid'];
+    $login_token      = $_POST['login_token'];
+
+    // Clean numeric values (remove commas, currency symbols etc.)
+    function cleanMoney($value) {
+        return floatval(preg_replace('/[^0-9.]/', '', $value));
+    }
+
+    $paid_amount           = cleanMoney($_POST['paid_amount']);
+    $gst_amount            = cleanMoney($_POST['gst_amount']);
+    $total_paid_amount     = cleanMoney($_POST['total_paid_amount']);
+    $renewal_amount        = cleanMoney($_POST['renewal_amount']);
+    $renewal_gst_amount    = cleanMoney($_POST['renewal_gst_amount']);
+    $renewal_total_amount  = cleanMoney($_POST['renewal_total_amount']);
 
     try {
-        // Prepare and bind
-        $stmt = $conn->prepare("INSERT INTO baris_userlogin (db_userLoginName, db_username, db_password, db_phone, db_email, db_usertype, db_designation, reportType, OrgID, DivisionId, StationId, db_valid_from, db_valid, paid_amount, gst_amount, total_paid_amount, renewal_amount, renewal_gst_amount, renewal_total_amount, login_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // Prepare SQL with correct data types
+        $stmt = $conn->prepare("INSERT INTO baris_userlogin (
+            db_userLoginName, db_username, db_password, db_phone, db_email,
+            db_usertype, db_designation, reportType, OrgID, DivisionId, StationId,
+            db_valid_from, db_valid,
+            paid_amount, gst_amount, total_paid_amount,
+            renewal_amount, renewal_gst_amount, renewal_total_amount,
+            login_token
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-        $stmt->bind_param("sssssssissssssssssss", $db_userLoginName, $db_username, $db_password, $db_phone, $db_email, $db_usertype, $db_designation, $reportType, $OrgID, $DivisionId, $StationId, $db_valid_from, $db_valid, $paid_amount, $gst_amount, $total_paid_amount, $renewal_amount, $renewal_gst_amount, $renewal_total_amount, $login_token);
+        // Bind parameters correctly: s = string, i = integer, d = double
+        $stmt->bind_param(
+            "sssssssiiisssdddddds" , // ✅ 20 characters
 
+            $db_userLoginName,
+            $db_username,
+            $db_password,
+            $db_phone,
+            $db_email,
+            $db_usertype,
+            $db_designation,
+            $reportType,         // assuming reportType is an int; change to "s" if it's string
+            $OrgID,
+            $DivisionId,
+            $StationId,
+            $db_valid_from,
+            $db_valid,
+            $paid_amount,
+            $gst_amount,
+            $total_paid_amount,
+            $renewal_amount,
+            $renewal_gst_amount,
+            $renewal_total_amount,
+            $login_token
+        );
+
+        // Execute the statement
         if ($stmt->execute()) {
-            $successMsg = "User created successfully";
+            // Redirect on success
+            header("Location: create-user.php?success=true");
+            exit();
         } else {
+            // Log the error
             $errorMsg = "Error: " . $stmt->error;
+            echo $errorMsg;
         }
+
+        // Clean up
         $stmt->close();
+        $conn->close();
     } catch (Exception $e) {
-        $errorMsg = "Error: " . $e->getMessage();
+        echo "Exception: " . $e->getMessage();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

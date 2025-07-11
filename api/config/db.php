@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "localhost";
-    private $db_name = "beatme_pmc_database";
-    private $username = "beatme_pmc";
-    private $password = "&r(x0xzIuoOS";
+    private $host = "160.187.5.190";
+    private $dbname = "pmcbeatlemeco_db";
+    private $username = "pmcbeatlemeco_user";
+    private $password = "Aksh@9412";
     public $conn;
     
     

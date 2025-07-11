@@ -106,6 +106,30 @@
             </div>
         </div>
         
+        <div class="mb-2">
+            <button class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-800 transition-colors">
+                <div class="flex items-center">
+                    <i class="fas fa-user w-5 mr-3"></i>
+                    <span>Feedback</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs"></i>
+            </button>
+            <div class="pl-12 mt-1 space-y-1">
+                <a href="create_feedback_station.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Feedback
+                </a>
+                <a href="create_feedback_questions.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Question
+                </a>
+                <a href="create-rating-parameters.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Create Parameters
+                </a>
+                 <a href="otp_status.php" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition-colors">
+                    Manage OTP Status
+                </a>
+            </div>
+        </div>
+        
         <p class="text-xs font-bold text-gray-400 uppercase mb-4 mt-8">Other</p>
         
         <a href="#" class="flex items-center p-3 mb-2 rounded-lg hover:bg-gray-800 transition-colors">

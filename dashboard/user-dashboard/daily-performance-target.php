@@ -26,8 +26,8 @@ $conn->close();
         .body {
             width: 100%;
             margin: auto;
-            font-weight: 500;
-            font-size: 12px;
+            font-weight: 800;
+            font-size: 11px;
             font-family: 'Roboto';
         }
 

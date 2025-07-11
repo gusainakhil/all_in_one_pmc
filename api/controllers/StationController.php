@@ -27,7 +27,8 @@ class StationController {
             echo json_encode([
                 "status" => true,
                 "stationName" => $data['stationName'],
-                "db_questionsId" => $data['db_questionsId']
+                "db_questionsId" => $data['db_questionsId'],
+                "stationId" => $data['stationId']
             ]);
         } else {
             echo json_encode([

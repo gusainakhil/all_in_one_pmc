@@ -30,7 +30,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect based on user type
             if ($row['db_usertype'] == 'SU_admin') {
-                header("Location: dashboard/admin/index.php");
+                    
+            $_SESSION['username'] = $user['db_userLoginName'];
+            $_SESSION['usertype'] = $user['db_usertype'];
+            
+            
+
+                header("Location: dashboard/admin/dashboard.php");
                 exit();
             } elseif ($row['db_usertype'] == 'owner') {
                 header("Location: dashboard/user-dashboard/index.php");

@@ -68,7 +68,7 @@ $result = $stmt->get_result();
           <i class="bi bi-list" style="color:white; font-size:25px;"></i>
         </a>
       </li>
-      <li style="float: left;font-size: 25px;color: #fff;font-weight:100; margin-left: 11px;line-height: 50px;" class="nav-item d-none d-md-block">INDIAN RAILWAYS - Platform Mechanized Cleanliness</li>
+      <li style="float: left;font-size: 25px;color: #fff;font-weight:100; margin-left: 11px;line-height: 50px;" class="nav-item d-none d-md-block">INDIAN RAILWAYS - Station cleaning</li>
 
     </ul>
     <!--end::Start Navbar Links-->
@@ -134,7 +134,8 @@ $result = $stmt->get_result();
               <i class="nav-arrow bi bi-chevron-right"></i>
             </p>
           </a>
-          <ul class="nav nav-treeview">
+    
+             <ul class="nav nav-treeview">
 
 
             <?php
@@ -163,25 +164,25 @@ $result = $stmt->get_result();
             </li>
           </ul>
         </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link">
-            <i class="nav-icon bi bi-circle"></i>
-            <p>Passenger Feedback </p>
-          </a>
-        </li>
+        <!--<li class="nav-item">-->
+        <!--  <a href="#" class="nav-link">-->
+        <!--    <i class="nav-icon bi bi-circle"></i>-->
+        <!--    <p>Passenger Feedback </p>-->
+        <!--  </a>-->
+        <!--</li>-->
 
-        <li class="nav-item">
-          <a href="equipments.php" class="nav-link">
-            <i class="nav-icon bi bi-circle"></i>
-            <p>equipments</p>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="photo-report.php" class="nav-link">
-            <i class="nav-icon bi bi-circle"></i>
-            <p>Photo Report </p>
-          </a>
-        </li>
+        <!--<li class="nav-item">-->
+        <!--  <a href="equipments.php" class="nav-link">-->
+        <!--    <i class="nav-icon bi bi-circle"></i>-->
+        <!--    <p>equipments</p>-->
+        <!--  </a>-->
+        <!--</li>-->
+        <!--<li class="nav-item">-->
+        <!--  <a href="photo-report.php" class="nav-link">-->
+        <!--    <i class="nav-icon bi bi-circle"></i>-->
+        <!--    <p>Photo Report </p>-->
+        <!--  </a>-->
+        <!--</li>-->
       </ul>
       <!--end::Sidebar Menu-->
     </nav>

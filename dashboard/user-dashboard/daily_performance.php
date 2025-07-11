@@ -35,7 +35,14 @@ $dateRange = new DatePeriod($start, $interval, $end);
 <?php include "head.php" ?>
 <style>
   /* Performance dashboard styles */
-  
+   .report-container {
+            width: 99%;
+            margin: auto;
+            page-break-after: always;
+            font-weight: 800;
+            font-size:11px;
+            font-family: 'Roboto' !IMPORTANT;
+        }
   
   .filter-container {
     background-color: #f8f9fa;
@@ -48,6 +55,8 @@ $dateRange = new DatePeriod($start, $interval, $end);
     align-items: center;
     justify-content: center;
   }
+  
+  
   
   .action-buttons {
     display: flex;
@@ -177,6 +186,27 @@ $dateRange = new DatePeriod($start, $interval, $end);
         <!--begin::Container-->
         <div class="container-fluid">
           <div class="row">
+               <div class="col-lg-7 mb-3">
+              <div class="performance-container p-3">
+                <form method="get" class="no-print">
+                  <div class="d-flex flex-wrap gap-2 align-items-end">
+                    <div class="flex-grow-1">
+                      <!-- <label for="from_date" class="form-label mb-1">From Date</label> -->
+                      <input type="date" name="from_date" id="from_date" class="form-control" value="<?= htmlspecialchars($fromDate) ?>">
+                    </div>
+                    <div class="flex-grow-1">
+                      <!-- <label for="to_date" class="form-label mb-1">To Date</label> -->
+                      <input type="date" name="to_date" id="to_date" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
+                    </div>
+                    <div>
+                      <button type="submit" class="btn btn-success px-4">
+                        <i class="fas fa-sync-alt me-1"></i> Go
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
             <div class="col-lg-5 mb-3">
               <div class="performance-container p-3">
                 <div class="action-buttons no-print">
@@ -196,27 +226,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
               </div>
             </div>  
             
-            <div class="col-lg-7 mb-3">
-              <div class="performance-container p-3">
-                <form method="get" class="no-print">
-                  <div class="d-flex flex-wrap gap-2 align-items-end">
-                    <div class="flex-grow-1">
-                      <!-- <label for="from_date" class="form-label mb-1">From Date</label> -->
-                      <input type="date" name="from_date" id="from_date" class="form-control" value="<?= htmlspecialchars($fromDate) ?>">
-                    </div>
-                    <div class="flex-grow-1">
-                      <!-- <label for="to_date" class="form-label mb-1">To Date</label> -->
-                      <input type="date" name="to_date" id="to_date" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
-                    </div>
-                    <div>
-                      <button type="submit" class="btn btn-primary px-4">
-                        <i class="fas fa-sync-alt me-1"></i> Generate
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
+           
           </div>
           
           <!-- Loading indicator -->
@@ -226,7 +236,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
           </div>
           
           <!-- Report Container - will be shown after loading -->
-          <div id="report-container" style="display: none;">
+          <div class ="report-container" id="report-container" style="display: none;">
             <?php
             foreach ($dateRange as $dateObj) {
               $currentDate = $dateObj->format("Y-m-d");
@@ -303,7 +313,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
             ?>
                 <div class="performance-container mb-4">
                   <div class="report-header">
-                    <h3>Daily performance log book for cleaning schedule for environmental sanitation, mechanized cleaning and housekeeping contract at Tirupati <?= htmlspecialchars($station) ?> Railway Station</h3>
+                    <h3 class ="text-center">Daily performance log book for cleaning schedule for environmental sanitation, mechanized cleaning and housekeeping contract at Tirupati <?= htmlspecialchars($station) ?> Railway Station</h3>
                   </div>
 
                   <div class="meta-info">

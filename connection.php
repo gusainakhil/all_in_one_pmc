@@ -7,10 +7,10 @@
 
 
 //new 
-$host = '97.74.91.11';
-$dbname = 'beatme_pmcf'; 
-$username = 'beatme_pmcf';
-$password = 'jmXadm0O!4]m';
+$host = '160.187.5.190';
+$dbname = 'pmcbeatlemeco_db'; 
+$username = 'pmcbeatlemeco_user';
+$password = 'Aksh@9412';
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

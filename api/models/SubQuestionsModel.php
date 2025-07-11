@@ -8,16 +8,19 @@ class SubQuestionsModel {
 
     public function getSubquestionsByUserId($user_id) {
         $query = "
-            SELECT 
+           SELECT 
                 u.userId, u.OrgID, u.StationId,
                 s.db_questionsId,
                 q.queId, q.queName, q.subqueId,
-                sq.subqueName, sq.subqueType, sq.subqueId AS subquestion_id
+                sq.subqueName, sq.subqueType, sq.subqueId AS subquestion_id,
+                sq.db_paramId as parameteresId
+      
             FROM baris_userlogin u
             JOIN baris_station s ON u.OrgID = s.OrgID
             JOIN baris_question q ON s.db_questionsId = q.queId
             JOIN baris_subquestion sq ON FIND_IN_SET(sq.subqueId, q.subqueId)
-            WHERE u.userId = ?
+            
+            WHERE u.userId  = ?
         ";
 
         $stmt = $this->pdo->prepare($query);

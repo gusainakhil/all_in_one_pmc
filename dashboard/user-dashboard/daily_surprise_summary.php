@@ -144,9 +144,12 @@ $conn->close();
 </head>
     <style>
         .container {
-            width: 95%;
+            width: 80%;
             margin: auto;
             page-break-after: always;
+            font-weight: 800;
+            font-size:11px;
+            font-family: 'Roboto' !IMPORTANT;
         }
         .report-title {
             text-align: center;

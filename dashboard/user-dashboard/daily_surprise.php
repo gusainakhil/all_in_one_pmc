@@ -23,12 +23,18 @@ $period = new DatePeriod(
         height: 90vh;
         overflow-y: auto;
          font-size:11px;
-         font-weight:400;
         box-sizing: border-box;
+            font-family: 'Roboto' !IMPORTANT;
+    font-weight: 800;
+        
     }
+    
+    body {
+
+}
 
     .railway-container {
-        width: 95%;
+        width: 80%;
         margin: auto;
         page-break-after: always;
     }
@@ -65,12 +71,12 @@ $period = new DatePeriod(
     .railway-table th {
         background-color: #f2f2f2;
     }
-    .railway-table th:nth-child(1) { width: 5%; }   
-    .railway-table th:nth-child(2) { width: 30%; } 
-    .railway-table th:nth-child(3) { width: 20%; }  
-    .railway-table th:nth-child(4) { width: 10%; } 
-    .railway-table th:nth-child(5) { width: 10%; }  
-    .railway-table th:nth-child(6) { width: 10%; }
+    .railway-table th:nth-child(1) { width: 2%; }   
+    .railway-table th:nth-child(2) { width: 20%; } 
+    .railway-table th:nth-child(3) { width: 8%; }  
+    .railway-table th:nth-child(4) { width: 5%; } 
+    .railway-table th:nth-child(5) { width: 5%; }  
+    .railway-table th:nth-child(6) { width: 5%; }
     .railway-filter-form {
         display: flex;
         justify-content: center;
@@ -88,7 +94,7 @@ $period = new DatePeriod(
     
     .railway-filter-form input[type="date"],
     .railway-filter-form button {
-        padding: 8px 12px;
+        padding: 4px 12px;
         border: 1px solid #ccc;
         border-radius: 5px;
         font-size: 14px;
@@ -135,6 +141,7 @@ $period = new DatePeriod(
     <input type="hidden" name="station_id" value="<?php echo htmlspecialchars($station_id); ?>">
     <button type="submit">Go</button>
      <a href="daily_surprise_summary.php" target="_blank" style="text-decoration:none; color:white; background-color:green; padding:8px 12px; border-radius:5px; border:none; font-size:14px; display:inline-block;">summary</a>
+         <!--<a href="daily_surprise_summary.php" target="_blank" style="text-decoration:none; color:white; background-color:green; padding:8px 12px; border-radius:5px; border:none; font-size:14px; display:inline-block;">print</a>-->
 </form>
 <br>
 <div class="railway-frame">

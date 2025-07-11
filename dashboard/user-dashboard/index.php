@@ -249,7 +249,7 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
               <!-- Daily Performance Chart -->
               <div class="col-md-6">
                 <div class="dashboard-card">
-                  <h3>Daily Performance (Last 30 Days)</h3>
+                  <h3>overall (Last 30 Days)</h3>
                   <div class="chart-container">
                     <canvas id="dailyPerformanceChart"></canvas>
                   </div>
@@ -258,27 +258,7 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
             </div>
             
             <!-- Second Row of Charts -->
-            <div class="row">
-              <!-- Platform Performance Chart -->
-              <div class="col-md-6">
-                <div class="dashboard-card">
-                  <h3>Platform Performance</h3>
-                  <div class="chart-container">
-                    <canvas id="platformPerformanceChart"></canvas>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Categories Breakdown -->
-              <div class="col-md-6">
-                <div class="dashboard-card">
-                  <h3>Categories Breakdown</h3>
-                  <div class="chart-container">
-                    <canvas id="categoriesChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
+
             
             <!-- Third Row - Metrics Cards -->
             <div class="row">
@@ -296,7 +276,7 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
               <div class="col-md-3">
                 <div class="dashboard-card">
                   <div class="metric-card">
-                    <div class="metric-label">Completion Rate</div>
+                    <div class="metric-label">Daily surprise visit</div>
                     <div class="metric-value">92.1%</div>
                     <div>
                       <span class="badge bg-danger">-1.5%</span> vs last month
@@ -307,7 +287,7 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
               <div class="col-md-3">
                 <div class="dashboard-card">
                   <div class="metric-card">
-                    <div class="metric-label">On-Time Rate</div>
+                    <div class="metric-label">Cleanliness Score </div>
                     <div class="metric-value">78.3%</div>
                     <div>
                       <span class="badge bg-success">+4.2%</span> vs last month
@@ -318,7 +298,7 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
               <div class="col-md-3">
                 <div class="dashboard-card">
                   <div class="metric-card">
-                    <div class="metric-label">Cleanliness Score</div>
+                    <div class="metric-label">Feedback</div>
                     <div class="metric-value">88.9%</div>
                     <div>
                       <span class="badge bg-success">+1.7%</span> vs last month
@@ -329,17 +309,6 @@ if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
             </div>
             
             <!-- Additional Chart Row -->
-            <div class="row">
-              <!-- Train Performance Chart -->
-              <div class="col-md-12">
-                <div class="dashboard-card">
-                  <h3>Train Performance Comparison</h3>
-                  <div class="chart-container">
-                    <canvas id="trainComparisonChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
             
           </div>
         </div>
