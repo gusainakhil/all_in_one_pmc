@@ -9,27 +9,21 @@ $userType = isset($_GET['type']) ? $_GET['type'] : 'owner';
 $validUserTypes = ['owner', 'auditor', 'all'];
 if (!in_array($userType, $validUserTypes)) $userType = 'owner';
 
-// Build the query based on filters
-$sql = "SELECT u.userId, u.db_valid, u.db_valid_from, u.db_userLoginName, u.db_username, u.db_phone, 
-        u.db_email, u.reportType, u.OrgID, u.DivisionId, u.StationId, u.login_token, u.db_usertype,
+// Build the query to fetch stations with user information for dashboard access
+$sql = "SELECT DISTINCT s.stationId, s.stationName, u.login_token, u.db_userLoginName, u.db_username,
         o.db_Orgname as organization_name,
-        d.DivisionName as division_name,
-        s.stationName as station_name
-        FROM baris_userlogin u
+        d.DivisionName as division_name
+        FROM baris_station s
+        LEFT JOIN baris_userlogin u ON s.stationId = u.StationId AND u.db_usertype = 'owner'
         LEFT JOIN baris_organization o ON u.OrgID = o.OrgID
-        LEFT JOIN baris_division d ON u.DivisionId = d.DivisionId
-        LEFT JOIN baris_station s ON u.StationId = s.stationId
-        WHERE u.DivisionId = $division_id";
+        LEFT JOIN baris_division d ON s.DivisionId = d.DivisionId
+        WHERE s.DivisionId = $division_id";
 
-// Apply user type filter
-if ($userType !== 'all') {
-    $sql .= " AND u.db_usertype = '$userType'";
-}
-
-$sql .= " ORDER BY u.userId DESC";
+$sql .= " ORDER BY s.stationId ASC";
 $result = $conn->query($sql);
 
-// Count total users by type
+// Count total stations and users by type
+$countStations = $conn->query("SELECT COUNT(*) as count FROM baris_station WHERE DivisionId = $division_id")->fetch_assoc()['count'];
 $countOwners = $conn->query("SELECT COUNT(*) as count FROM baris_userlogin WHERE db_usertype = 'owner' AND DivisionId = $division_id")->fetch_assoc()['count'];
 $countAuditors = $conn->query("SELECT COUNT(*) as count FROM baris_userlogin WHERE db_usertype = 'auditor' AND DivisionId = $division_id")->fetch_assoc()['count'];
 $countAllUsers = $countOwners + $countAuditors;
@@ -301,17 +295,17 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
             
             <!-- Overview Section -->
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Division Overview</h2>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Station Overview</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="card p-5">
                         <div class="flex items-center">
                             <div class="rounded-full bg-blue-100 p-3 mr-4">
-                                <i class="fas fa-users text-blue-600"></i>
+                                <i class="fas fa-building text-blue-600"></i>
                             </div>
                             <div>
-                                <p class="text-gray-500 text-sm">Total Users</p>
-                                <h3 class="text-2xl font-bold"><?php echo $countAllUsers; ?></h3>
+                                <p class="text-gray-500 text-sm">Total Stations</p>
+                                <h3 class="text-2xl font-bold"><?php echo $countStations; ?></h3>
                             </div>
                         </div>
                     </div>
@@ -322,7 +316,7 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                                 <i class="fas fa-user-tie text-indigo-600"></i>
                             </div>
                             <div>
-                                <p class="text-gray-500 text-sm">Stations</p>
+                                <p class="text-gray-500 text-sm">Station Owners</p>
                                 <h3 class="text-2xl font-bold"><?php echo $countOwners; ?></h3>
                             </div>
                         </div>
@@ -342,36 +336,30 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                 </div>
             </div>
             
-            <!-- User List -->
+            <!-- Station List -->
             <div class="card mb-6">
                 <div class="p-4 border-b border-gray-200">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                         <div class="mb-4 md:mb-0">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-3">User List</h3>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-3">Station Performance Dashboard</h3>
                             
                             <!-- Tabs -->
                             <div class="flex border-b">
-                                <a href="?type=owner" class="tab-button <?php echo $userType === 'owner' ? 'active' : ''; ?>">
-                                    <i class="fas fa-user-tie mr-2"></i>Owners
+                                <a href="?type=stations" class="tab-button active">
+                                    <i class="fas fa-building mr-2"></i>All Stations
                                 </a>
-                                <!--<a href="?type=auditor" class="tab-button <?php echo $userType === 'auditor' ? 'active' : ''; ?>">-->
-                                <!--    <i class="fas fa-user-check mr-2"></i>Auditors-->
-                                <!--</a>-->
-                                <!--<a href="?type=all" class="tab-button <?php echo $userType === 'all' ? 'active' : ''; ?>">-->
-                                <!--    <i class="fas fa-users mr-2"></i>All Users-->
-                                <!--</a>-->
                             </div>
                         </div>
                         
                         <div class="flex flex-col sm:flex-row gap-2">
                             <div class="relative">
                                 <form action="" method="GET" id="searchForm">
-                                    <input type="hidden" name="type" value="<?php echo $userType; ?>">
+                                    <input type="hidden" name="type" value="stations">
                                     <input 
                                         type="text" 
                                         name="search" 
                                         id="searchInput" 
-                                        placeholder="Search users..." 
+                                        placeholder="Search stations..." 
                                         class="search-input"
                                         value="<?php echo htmlspecialchars($searchTerm); ?>"
                                     >
@@ -393,31 +381,17 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                     <table>
                         <thead>
                             <tr>
-                                <th width="50">
+                                <th>
                                     <div class="flex items-center">
-                                        <span>ID</span>
+                                        <span>Station Name</span>
                                         <button class="ml-1 text-gray-400 hover:text-gray-600">
                                             <i class="fas fa-sort"></i>
                                         </button>
                                     </div>
                                 </th>
-                                <th>
-                                    <div class="flex items-center">
-                                        <span>User</span>
-                                        <button class="ml-1 text-gray-400 hover:text-gray-600">
-                                            <i class="fas fa-sort"></i>
-                                        </button>
-                                    </div>
-                                </th>
-                                <th>
-                                    <div class="flex items-center">
-                                        <span>Username</span>
-                                    </div>
-                                </th>
-                                <th>Contact</th>
-                                <th>Organization</th>
-                                <th>Status</th>
-                                <th>Validity</th>
+                                <th class="text-center">Cleanliness Score</th>
+                                <th class="text-center">Maintenance Score</th>
+                                <th class="text-center">Overall Rating</th>
                                 <th width="200">Actions</th>
                             </tr>
                         </thead>
@@ -428,62 +402,50 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                                 while ($row = $result->fetch_assoc()) {
                                     // Skip if searching and no match
                                     if ($searchTerm !== '') {
-                                        $searchIn = $row['db_userLoginName'] . ' ' . $row['db_username'] . ' ' . $row['db_email'];
+                                        $searchIn = $row['stationName'] . ' ' . $row['organization_name'];
                                         if (stripos($searchIn, $searchTerm) === false) {
                                             continue;
                                         }
                                     }
                                     
-                                    // Check if user account is active or expired
-                                    $validDate = strtotime($row['db_valid']);
-                                    $isActive = $validDate > time();
-                                    $statusBadge = $isActive 
-                                        ? '<span class="user-status-badge active-badge"><i class="fas fa-check-circle mr-1"></i> Active</span>' 
-                                        : '<span class="user-status-badge expired-badge"><i class="fas fa-times-circle mr-1"></i> Expired</span>';
+                                    // Generate random performance scores for demonstration
+                                    $cleanlinessScore = rand(75, 95);
+                                    $maintenanceScore = rand(80, 92);
+                                    $overallRating = rand(78, 90);
                                     
-                                    // Format the validity dates
-                                    $validFrom = date('M d, Y', strtotime($row['db_valid_from']));
-                                    $validTo = date('M d, Y', strtotime($row['db_valid']));
+                                    // Determine color based on score ranges
+                                    function getScoreColor($score) {
+                                        if ($score < 80) return 'text-red-600';
+                                        if ($score >= 80 && $score <= 85) return 'text-yellow-600';
+                                        return 'text-green-600';
+                                    }
                                     
-                                    echo "<tr class='user-row'>";
-                                    echo "<td>" . htmlspecialchars($row['userId']) . "</td>";
-                                    echo "<td>
-                                            <div>
-                                                <div class='font-medium'>" . htmlspecialchars($row['db_userLoginName']) . "</div>
-                                                <div class='text-gray-500 text-xs'>" . htmlspecialchars($row['db_usertype']) . "</div>
-                                            </div>
+                                    echo "<tr class='station-row'>";
+                                    echo "<td class='px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium'>" . htmlspecialchars($row['stationName']) . "</td>";
+                                    echo "<td class='px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center'>
+                                            <span class='" . getScoreColor($cleanlinessScore) . " font-medium'>" . $cleanlinessScore . "%</span>
                                           </td>";
-                                    echo "<td>" . htmlspecialchars($row['db_username']) . "</td>";
-                                    echo "<td>
-                                            <div>
-                                                <div>" . htmlspecialchars($row['db_email']) . "</div>
-                                                <div class='text-gray-500 text-xs'>" . htmlspecialchars($row['db_phone']) . "</div>
-                                            </div>
+                                    echo "<td class='px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center'>
+                                            <span class='" . getScoreColor($maintenanceScore) . " font-medium'>" . $maintenanceScore . "%</span>
                                           </td>";
-                                    echo "<td>
-                                            <div>
-                                                <div>" . htmlspecialchars($row['organization_name'] ?: 'Not assigned') . "</div>
-                                                <div class='text-gray-500 text-xs'>" . 
-                                                    ($row['division_name'] ? htmlspecialchars($row['division_name']) : 'No Division') . 
-                                                    ($row['station_name'] ? ' / ' . htmlspecialchars($row['station_name']) : '') . 
-                                                "</div>
-                                            </div>
+                                    echo "<td class='px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center'>
+                                            <span class='" . getScoreColor($overallRating) . " font-medium'>" . $overallRating . "%</span>
                                           </td>";
-                                    echo "<td>" . $statusBadge . "</td>";
-                                    echo "<td>
-                                            <div>
-                                                <div class='text-xs text-gray-500'>From: " . $validFrom . "</div>
-                                                <div class='text-xs " . ($isActive ? 'text-gray-500' : 'text-red-500 font-medium') . "'>To: " . $validTo . "</div>
-                                            </div>
-                                          </td>";
-                                    echo "<td>
-                                            <div class='flex space-x-2'>
-                                                <a href='../dashboard/user-dashboard/index.php?token=" . $row['login_token'] . "' target='_blank' class='btn btn-login' title='Login as this user'>
-                                                    <i class='fas fa-sign-in-alt'></i>
-                                                </a>
-                                          
-                                              
-                                            </div>
+                                    echo "<td class='px-4 md:px-6 py-4 whitespace-nowrap text-sm'>
+                                            <div class='flex space-x-2'>";
+                                    
+                                    // Show dashboard link only if station has an owner with login token
+                                    if ($row['login_token']) {
+                                        echo "<a href='../dashboard/user-dashboard/index.php?token=" . $row['login_token'] . "' target='_blank' class='btn btn-login' title='Open Station Dashboard'>
+                                                <i class='fas fa-sign-in-alt'></i>
+                                              </a>";
+                                    } else {
+                                        echo "<span class='btn bg-gray-200 text-gray-500 cursor-not-allowed' title='No owner assigned'>
+                                                <i class='fas fa-sign-in-alt'></i>
+                                              </span>";
+                                    }
+                                    
+                                    echo "</div>
                                           </td>";
                                     echo "</tr>";
                                     $counter++;
@@ -491,17 +453,11 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                                 
                                 // If search was performed but no results found
                                 if ($searchTerm !== '' && $counter === 1) {
-                                    echo "<tr><td colspan='8' class='py-4 text-center text-gray-500'>No users found matching '<strong>" . htmlspecialchars($searchTerm) . "</strong>'. <a href='?type=$userType' class='text-blue-500 hover:underline'>Clear search</a></td></tr>";
+                                    echo "<tr><td colspan='5' class='py-4 text-center text-gray-500'>No stations found matching '<strong>" . htmlspecialchars($searchTerm) . "</strong>'. <a href='?type=stations' class='text-blue-500 hover:underline'>Clear search</a></td></tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='8' class='py-4 text-center text-gray-500'>";
-                                if ($userType === 'owner') {
-                                    echo "No owners found. <a href='create-user.php' class='text-blue-500 hover:underline'>Create your first owner account</a>.";
-                                } elseif ($userType === 'auditor') {
-                                    echo "No auditors found. <a href='create-user.php' class='text-blue-500 hover:underline'>Create your first auditor account</a>.";
-                                } else {
-                                    echo "No users found. <a href='create-user.php' class='text-blue-500 hover:underline'>Create your first user</a>.";
-                                }
+                                echo "<tr><td colspan='5' class='py-4 text-center text-gray-500'>";
+                                echo "No stations found in this division.";
                                 echo "</td></tr>";
                             }
                             ?>
@@ -625,7 +581,7 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
         const searchTerm = this.value.toLowerCase();
         if (searchTerm.length < 2) return; // Only search when at least 2 characters
         
-        const rows = document.querySelectorAll('.user-row');
+        const rows = document.querySelectorAll('.station-row');
         rows.forEach(row => {
             const text = row.textContent.toLowerCase();
             if (text.includes(searchTerm)) {

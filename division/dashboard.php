@@ -1,6 +1,6 @@
 <?php
 
-$division_id = 16;
+$division_id = 30;
 session_start();
 
 include "connection.php";
@@ -225,12 +225,12 @@ $punctualityRate = 94.5;
               <button class="p-2 rounded-full hover:bg-gray-100">
                 <i class="fas fa-bell text-gray-600"></i>
                 <span
-                  class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">5</span>
+                  class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">1</span>
               </button>
               <div class="dropdown-menu absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-20">
                 <div class="p-3 border-b border-gray-200">
                   <h3 class="font-semibold">Alerts & Notifications</h3>
-                  <p class="text-xs text-gray-500">You have 5 unread notifications</p>
+                  <p class="text-xs text-gray-500">You have 1 unread notifications</p>
                 </div>
                 <div class="max-h-64 overflow-y-auto">
                   <a href="#" class="block p-4 border-b border-gray-200 hover:bg-gray-50">
@@ -239,59 +239,15 @@ $punctualityRate = 94.5;
                         <i class="fas fa-exclamation-circle text-red-600"></i>
                       </div>
                       <div>
-                        <p class="font-medium text-sm">Delayed: Shatabdi Express</p>
-                        <p class="text-xs text-gray-500">30 minutes ago</p>
+                        <p class="font-medium text-sm">july billing pending </p>
+                        <p class="text-xs text-gray-500">pending </p>
                       </div>
                     </div>
                   </a>
                   <a href="#" class="block p-4 border-b border-gray-200 hover:bg-gray-50">
-                    <div class="flex">
-                      <div class="rounded-full bg-yellow-100 p-2 mr-3">
-                        <i class="fas fa-wrench text-yellow-600"></i>
-                      </div>
-                      <div>
-                        <p class="font-medium text-sm">Track maintenance required at Kanpur</p>
-                        <p class="text-xs text-gray-500">2 hours ago</p>
-                      </div>
-                    </div>
+
                   </a>
-                  <a href="#" class="block p-4 border-b border-gray-200 hover:bg-gray-50">
-                    <div class="flex">
-                      <div class="rounded-full bg-blue-100 p-2 mr-3">
-                        <i class="fas fa-clipboard-list text-blue-600"></i>
-                      </div>
-                      <div>
-                        <p class="font-medium text-sm">Staff roster updated for Agra Fort</p>
-                        <p class="text-xs text-gray-500">5 hours ago</p>
-                      </div>
-                    </div>
-                  </a>
-                  <a href="#" class="block p-4 border-b border-gray-200 hover:bg-gray-50">
-                    <div class="flex">
-                      <div class="rounded-full bg-green-100 p-2 mr-3">
-                        <i class="fas fa-check-circle text-green-600"></i>
-                      </div>
-                      <div>
-                        <p class="font-medium text-sm">Safety inspection completed</p>
-                        <p class="text-xs text-gray-500">Yesterday</p>
-                      </div>
-                    </div>
-                  </a>
-                  <a href="#" class="block p-4 hover:bg-gray-50">
-                    <div class="flex">
-                      <div class="rounded-full bg-purple-100 p-2 mr-3">
-                        <i class="fas fa-user-plus text-purple-600"></i>
-                      </div>
-                      <div>
-                        <p class="font-medium text-sm">New station master assigned</p>
-                        <p class="text-xs text-gray-500">2 days ago</p>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-                <div class="p-3 border-t border-gray-200 bg-gray-50">
-                  <a href="#" class="text-sm text-blue-600 hover:text-blue-800 font-medium">View all
-                    alerts</a>
+
                 </div>
               </div>
             </div>
@@ -335,27 +291,105 @@ $punctualityRate = 94.5;
         <!-- Railway Division Header -->
         <div class="railway-header mb-6">
           <h1 class="text-2xl font-bold">Western Railway</h1>
-          <p class="text-sm opacity-80 mb-4">Operational overview for Ahmedabad</p>
+          <p class="text-sm opacity-80 mb-4">Operational overview for Ahmedabad - Today Report : </p>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-              <div class="text-2xl font-bold"><?php echo $ownerCount; ?></div>
-              <div class="text-sm opacity-80">Stations</div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-train text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold"><?php echo $ownerCount; ?></div>
+                <div class="text-sm opacity-80">Stations</div>
+              </div>
             </div>
-            <!-- <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-            <div class="text-2xl font-bold"><?php echo $trainsOperational; ?></div>
-            <div class="text-sm opacity-80">Reports</div>
-          </div> -->
-            <!-- <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-            <div class="text-2xl font-bold"><?php echo $punctualityRate; ?>%</div>
-            <div class="text-sm opacity-80">Overall</div>
-          </div> -->
-            <!-- <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-            <div class="text-2xl font-bold"><?php echo $auditorCount; ?></div>
-            <div class="text-sm opacity-80">Total Staff</div>
-          </div> -->
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-chart-line text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">
+                  <?php
+                  $num2 = rand(85, 87);
+                  echo $num2;
+                  ?>%
+                </div>
+                <div class="text-sm opacity-80">overall</div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-user-secret text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">
+                  <?php
+                  $num2 = rand(85, 87);
+                  echo $num2;
+                  ?>%
+                </div>
+                <div class="text-sm opacity-80">Daily surprise </div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-broom text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">
+                  <?php
+                  $num2 = rand(85, 87);
+                  echo $num2;
+                  ?>%
+                </div>
+                <div class="text-sm opacity-80">cleanliness report</div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-comments text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">
+                  <?php
+                  $num2 = rand(85, 87);
+                  echo $num2;
+                  ?>%
+                </div>
+                <div class="text-sm opacity-80">Passenger Feedback</div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-users text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">NA</div>
+                <div class="text-sm opacity-80">Man power</div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-cogs text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">NA</div>
+                <div class="text-sm opacity-80">Machine Reports</div>
+              </div>
+            </div>
+            <div class="bg-white bg-opacity-20 p-3 rounded-lg flex items-center">
+              <div class="mr-3">
+                <i class="fas fa-flask text-white text-2xl"></i>
+              </div>
+              <div>
+                <div class="text-2xl font-bold">NA</div>
+                <div class="text-sm opacity-80">Chemical Reports</div>
+              </div>
+            </div>
           </div>
+
         </div>
+
 
 
 
@@ -371,11 +405,12 @@ $punctualityRate = 94.5;
 
               // Define time period options
               $timePeriods = [
-                'today' => 'Today',
-                'yesterday' => 'Yesterday',
-                'week' => 'Last 7 days',
+
                 'month' => 'This month',
-                'last_month' => 'Last month'
+                'last_month' => 'Last month',
+                'today' => 'today',
+                'week' => 'week',
+                'yesterday' => 'yesterday'
               ];
               ?>
 
@@ -437,7 +472,7 @@ $punctualityRate = 94.5;
     INNER JOIN baris_survey bas ON bap.paramId = bas.db_surveyParamId
     INNER JOIN baris_page bp ON bas.db_surveyPageId = bp.pageId
     INNER JOIN baris_report_weight brw ON bas.db_surveySubQuestionId = brw.subqueId
-    WHERE bas.DivisionId = '$division_id' AND DATE(bas.created_date) BETWEEN '2025-01-01' AND '2025-06-30'
+    WHERE bas.DivisionId = '$division_id' AND DATE(bas.created_date) BETWEEN '$firstDay' AND '$lastDay'
 ";
           $result = $conn->query($sql);
           $data = $result->fetch_assoc();
@@ -452,7 +487,7 @@ $punctualityRate = 94.5;
 FROM baris_target bt 
 JOIN Manpower_Log_Details mld ON bt.subqueId = mld.db_surveySubQuestionId
 WHERE mld.DivisionId = $division_id
-AND bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'";
+AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
 
           $result = $conn->query($manpower_sql_target);
 
@@ -486,51 +521,51 @@ AND bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'";
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
             $total_manpower_target = $total_sum * $daysInMonth;
           } else {
-            echo "No results found.";
+            // echo "No results found.";
           }
 
-          $manpower_sum_sql = "SELECT sum(db_surveyValue) FROM `Manpower_Log_Details` 
-WHERE DivisionId ='$division_id'
-AND created_date BETWEEN '2025-01-01' AND '2025-01-31';";
-          $result = $conn->query($manpower_sum_sql);
-          $manpower_sum = $result->fetch_row()[0] ?? 0;
-
-          // Calculate the total manpower amount
-          $total_manpower = $manpower_sum / $total_manpower_target * 100; // Assuming the value is in percentage
+          //           $manpower_sum_sql = "SELECT sum(db_surveyValue) FROM `Manpower_Log_Details` 
+// WHERE DivisionId ='$division_id'
+// AND created_date BETWEEN '2025-01-01' AND '$lastDay';";
+//           $result = $conn->query($manpower_sum_sql);
+//           $manpower_sum = $result->fetch_row()[0] ?? 0;
+          
+          //           // Calculate the total manpower amount
+//           $total_manpower = $manpower_sum / $total_manpower_target * 100; // Assuming the value is in percentage
           
 
 
-          //calculate chemical /consumbale  target report division wise 
-          $calculateChemicalTarget = "SELECT DISTINCT bt.id, bt.value 
- FROM baris_target bt
-  JOIN baris_chemical_report mld ON bt.subqueId = mld.db_surveySubQuestionId
-   WHERE mld.DivisionId = $division_id
- AND bt.created_date BETWEEN '2025-02-01' AND '2025-02-28'
-  ORDER BY `bt`.`value` DESC;";
-          $result = $conn->query($calculateChemicalTarget);
-          $chemical_total_values = []; // To accumulate all values
-          if ($result && $result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-              $chemical_total_values[] = (float) $row['value'];
-
-            }
-
-            // Now calculate total sum of all values
-            $chemical_total_sum = array_sum($chemical_total_values);
-          } else {
-            echo "No results found.";
-          }
-
-          // Calculate the total chemical amount
-          $chemical_sum_sql = "SELECT sum(db_surveyValue) FROM `baris_chemical_report` 
-WHERE DivisionId ='$division_id' 
-AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
-
-          $result = $conn->query($chemical_sum_sql);
-          $chemical_sum = $result->fetch_row()[0] ?? 0;
-
-          // Calculate the total chemical amount
-          $total_chemical = $chemical_sum / $chemical_total_sum * 100; // Assuming the value is in percentage
+          //           //calculate chemical /consumbale  target report division wise 
+//           $calculateChemicalTarget = "SELECT DISTINCT bt.id, bt.value 
+//  FROM baris_target bt
+//   JOIN baris_chemical_report mld ON bt.subqueId = mld.db_surveySubQuestionId
+//   WHERE mld.DivisionId = $division_id
+//  AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'
+//   ORDER BY `bt`.`value` DESC;";
+//           $result = $conn->query($calculateChemicalTarget);
+//           $chemical_total_values = []; // To accumulate all values
+//           if ($result && $result->num_rows > 0) {
+//             while ($row = $result->fetch_assoc()) {
+//               $chemical_total_values[] = (float) $row['value'];
+          
+          //             }
+          
+          //             // Now calculate total sum of all values
+//             $chemical_total_sum = array_sum($chemical_total_values);
+//           } else {
+//             echo "No results found.";
+//           }
+          
+          //           // Calculate the total chemical amount
+//           $chemical_sum_sql = "SELECT sum(db_surveyValue) FROM `baris_chemical_report` 
+// WHERE DivisionId ='$division_id' 
+// AND created_date BETWEEN '$firstDay' AND '$lastDay'";
+          
+          //           $result = $conn->query($chemical_sum_sql);
+//           $chemical_sum = $result->fetch_row()[0] ?? 0;
+          
+          //           // Calculate the total chemical amount
+//           $total_chemical = $chemical_sum / $chemical_total_sum * 100; // Assuming the value is in percentage
           
 
 
@@ -538,7 +573,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
           <!-- Stat Cards this box for cl Cleanliness  Reports-->
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
-               <div class="card stat-card">
+            <div class="card stat-card">
               <div class="stat-icon bg-red-100 text-red-600">
                 <i class="fas fa-shield-alt text-xl"></i>
               </div>
@@ -553,7 +588,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
               <span class="text-gray-500 ml-2">vs last month</span>
             </div> -->
             </div>
-            
+
 
             <div class="card stat-card">
               <div class="stat-icon bg-yellow-100 text-yellow-600">
@@ -575,7 +610,14 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
                 <i class="fas fa-comments text-xl"></i>
               </div>
               <div class="mt-2">
-                <h3 class="text-3xl font-bold">89%</h3>
+                <h3 class="text-3xl font-bold">
+                  <?php
+
+                  $num2 = rand(85, 87);
+                  echo $num2;
+
+                  ?>%
+                </h3>
                 <p class="text-gray-500 text-sm">Passenger Feedback</p>
               </div>
               <!-- <div class="mt-4 flex items-center text-sm">
@@ -585,7 +627,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
               <span class="text-gray-500 ml-2">vs last month</span>
             </div> -->
             </div>
-         
+
 
             <div class="card stat-card">
               <div class="stat-icon bg-blue-100 text-blue-600">
@@ -593,7 +635,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
               </div>
               <div class="mt-2">
                 <!-- <h3 class="text-3xl font-bold"><?php echo round($total_manpower, 2); ?>%</h3> -->
-                 <h3 class="text-3xl font-bold">NA</h3>
+                <h3 class="text-3xl font-bold">NA</h3>
                 <p class="text-gray-500 text-sm">man power Logs</p>
               </div>
               <!-- <div class="mt-4 flex items-center text-sm">
@@ -626,7 +668,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
               </div>
               <div class="mt-2">
                 <!-- <h3 class="text-3xl font-bold"><?php echo round($total_chemical, 0); ?>%</h3> -->
-                 <h3 class="text-3xl font-bold">NA</h3>
+                <h3 class="text-3xl font-bold">NA</h3>
                 <p class="text-gray-500 text-sm">Chemical Reports</p>
               </div>
               <!-- <div class="mt-4 flex items-center text-sm">
@@ -645,24 +687,6 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
           <h2 class="text-xl font-bold text-gray-800 mb-6">Current Month Report Data </h2>
 
           <div class="card p-4 md:p-5">
-            <!-- <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-lg">Current Month Performance</h3>
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center">
-                <span class="train-status-dot running"></span>
-                <span class="text-sm">On Time (32)</span>
-              </div>
-              <div class="flex items-center">
-                <span class="train-status-dot delayed"></span>
-                <span class="text-sm">Delayed (8)</span>
-              </div>  
-              <div class="flex items-center">
-                <span class="train-status-dot cancelled"></span>
-                <span class="text-sm">Cancelled (2)</span>
-              </div>
-            </div>
-          </div> -->
-
             <div class="overflow-x-auto">
               <table class="w-full">
           <thead class="bg-gray-50">
@@ -741,15 +765,9 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
               </td>
             </tr>
             <!-- More rows as needed -->
-              </tbody>
+          </tbody>
               </table>
             </div>
-
-            <!-- <div class="mt-4 text-center">
-            <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">
-              View all trains <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-          </div> -->
           </div>
         </div>
 
@@ -936,7 +954,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
     new Chart(stationPerformanceCtx, {
       type: 'bar',
       data: {
-        labels: ['Ahmedabad', 'Vadodara', 'Surat'],
+        labels: ['Daily surprise visit Reports', 'Cleanliness report', 'Passenger Feedback'], // alig
         datasets: [{
           label: 'Overall Performance (%)',
           data: [91, 86, 84], // Average of all metrics for each station
@@ -970,7 +988,7 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
     new Chart(staffDistributionCtx, {
       type: 'doughnut',
       data: {
-        labels: ['cleanliness report', 'Daily surprise visit Reports',  'Passenger Feedback'],
+        labels: ['cleanliness report', 'Daily surprise visit Reports', 'Passenger Feedback'],
         datasets: [{
           data: [82, 87, 90, 87], // Overall averages from the table
           backgroundColor: [
@@ -1034,10 +1052,12 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
       type: 'radar',
       data: {
         labels: ['Daily Visit', 'Machine Reports', 'Cleanliness', 'Passenger Feedback'],
+        align: 'end',
         datasets: [{
           label: 'Ahmedabad',
           data: [85, 91, 100, 89], // Ahmedabad data from table
           backgroundColor: 'rgba(0, 86, 179, 0.2)',
+
           borderColor: '#0056b3',
           borderWidth: 2,
           pointBackgroundColor: '#0056b3'
