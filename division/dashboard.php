@@ -665,91 +665,83 @@ AND created_date BETWEEN '2025-02-01' AND '2025-02-28'";
 
             <div class="overflow-x-auto">
               <table class="w-full">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      station name</th>
-                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      cleanliness report%</t h>
-                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Daily surprise visit %</th>
-                    <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Passenger Feedback %</th>
-                   
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Ahmedabad
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        class="<?php echo (85 < 85) ? 'text-red-600' : ((85 >= 85 && 85 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">88%</span>
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        class="<?php echo (85 < 85) ? 'text-red-600' : ((91 >= 85 && 91 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">81.81%</span>
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">
-                      <span
-                        class="<?php echo (85 < 85) ? 'text-red-600' : ((92 >= 85 && 92 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">89%</span>
-                    </td>
-                
-                  </tr>
-                  <!--<tr>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Vadodara-->
-                  <!--  </td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (82 < 85) ? 'text-red-600' : ((82 >= 85 && 82 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">82%</span>-->
-                  <!--  </td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (87 < 85) ? 'text-red-600' : ((87 >= 85 && 87 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">87%</span>-->
-                  <!--  </td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (90 < 85) ? 'text-red-600' : ((90 >= 85 && 90 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">90%</span>-->
-                  <!--  </td>-->
-                  
-                  <!--</tr>-->
-                  <!--<tr>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Surat</td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (80 < 85) ? 'text-red-600' : ((80 >= 85 && 80 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">80%</span>-->
-                  <!--  </td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (83 < 85) ? 'text-red-600' : ((83 >= 85 && 83 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">83%</span>-->
-                  <!--  </td>-->
-                  <!--  <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm">-->
-                  <!--    <span-->
-                  <!--      class="<?php echo (88 < 85) ? 'text-red-600' : ((88 >= 85 && 88 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">88%</span>-->
-                  <!--  </td>-->
-                   
-                  <!--</tr>-->
-                  <!-- <tr>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Overall
-                      Average</td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span
-                        class="<?php echo (82 < 85) ? 'text-red-600' : ((82 >= 85 && 82 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">82%</span>
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span
-                        class="<?php echo (87 < 85) ? 'text-red-600' : ((87 >= 85 && 87 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">87%</span>
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span
-                        class="<?php echo (90 < 85) ? 'text-red-600' : ((90 >= 85 && 90 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">90%</span>
-                    </td>
-                    <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <span
-                        class="<?php echo (87 < 85) ? 'text-red-600' : ((87 >= 85 && 87 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">87%</span>
-                    </td>
-                  </tr> -->
-                </tbody>
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                station name</th>
+              <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                cleanliness report%</th>
+              <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Daily surprise visit %</th>
+              <th class="px-4 md:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Passenger Feedback %</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Sabarmati
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((85 >= 85 && 85 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((91 >= 85 && 91 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((92 >= 85 && 92 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Mehsan
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((85 >= 85 && 85 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((91 >= 85 && 91 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
+                <span
+            class="<?php echo (85 < 85) ? 'text-red-600' : ((92 >= 85 && 92 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
+            <?php
+            $num2 = rand(85, 87);
+            echo $num2;
+            ?>%
+                </span>
+              </td>
+            </tr>
+            <!-- More rows as needed -->
+              </tbody>
               </table>
             </div>
 
