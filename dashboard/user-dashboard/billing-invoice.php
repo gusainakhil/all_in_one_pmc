@@ -35,6 +35,8 @@ $selectedYear = $_GET['year'] ?? $currentYear;
 $firstDay = date('Y-m-01', strtotime("$selectedYear-$selectedMonth-01"));
 $lastDay = date('Y-m-t', strtotime("$selectedYear-$selectedMonth-01"));
 
+
+echo $station_id ."<br>";
 // Surprise visit score
 $sql = "
     SELECT 
@@ -45,7 +47,7 @@ $sql = "
     INNER JOIN baris_survey bas ON bap.paramId = bas.db_surveyParamId
     INNER JOIN baris_page bp ON bas.db_surveyPageId = bp.pageId
     INNER JOIN baris_report_weight brw ON bas.db_surveySubQuestionId = brw.subqueId
-    WHERE bas.db_surveyStationId = '$station_id' AND DATE(bas.created_date) BETWEEN '$firstDay' AND '$lastDay'
+    WHERE bas.db_surveyStationId = '$station_id'  AND DATE(bas.created_date) BETWEEN '$firstDay' AND '$lastDay'
 ";
 $result = $conn->query($sql);
 $data = $result->fetch_assoc();
@@ -54,48 +56,48 @@ $totalWeight = $data['weightage'] ?? 0;
 $surpriseVisitAmount = calculatealreportAmount($bill['sactioned_amount'], $totalWeight, $firstDay);
 
 // calculate chemiacl reord important for chemical report
-// $sql ="SELECT 
-//     (
-//         SELECT SUM(Bt.value)
-//         FROM baris_target AS Bt
-//         WHERE Bt.OrgID = 17
-//           AND Bt.created_date BETWEEN '$firstDay' AND '$lastDay'
-//           AND Bt.subqueId IN (
-//               SELECT DISTINCT bcr.db_surveySubQuestionId
-//               FROM baris_chemical_report AS bcr
-//               WHERE bcr.OrgID = $org_id
-//                 AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-//           )
-//     ) AS total_target,
+$sql ="SELECT 
+    (
+        SELECT SUM(Bt.value)
+        FROM baris_target AS Bt
+        WHERE Bt.OrgID = $org_id
+          AND Bt.created_date BETWEEN '$firstDay' AND '$lastDay'
+          AND Bt.subqueId IN (
+              SELECT DISTINCT bcr.db_surveySubQuestionId
+              FROM baris_chemical_report AS bcr
+              WHERE bcr.OrgID = $org_id
+                AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+          )
+    ) AS total_target,
 
-//     (
-//         SELECT 
-//             SUM(bcr.db_surveyValue)
-//         FROM baris_chemical_report AS bcr
-//         INNER JOIN baris_report_weight brw 
-//             ON bcr.db_surveySubQuestionId = brw.subqueId
-//         WHERE bcr.OrgID = $org_id
-//           AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-//     ) AS total_survey_value,
+    (
+        SELECT 
+            SUM(bcr.db_surveyValue)
+        FROM baris_chemical_report AS bcr
+        INNER JOIN baris_report_weight brw 
+            ON bcr.db_surveySubQuestionId = brw.subqueId
+        WHERE bcr.OrgID = $org_id
+          AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+    ) AS total_survey_value,
 
-//     (
-//         SELECT brw.weightage
-//         FROM baris_chemical_report AS bcr
-//         INNER JOIN baris_report_weight brw 
-//             ON bcr.db_surveySubQuestionId = brw.subqueId
-//         WHERE bcr.OrgID = $org_id
-//           AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
-//         LIMIT 1
-//     ) AS weightage;";
-// $result = $conn->query($sql);
-// $data = $result->fetch_assoc();
-// $total_target = $data['total_target'] ?? 0;
-// $total_survey_value = $data['total_survey_value'] ?? 0;
+    (
+        SELECT brw.weightage
+        FROM baris_chemical_report AS bcr
+        INNER JOIN baris_report_weight brw 
+            ON bcr.db_surveySubQuestionId = brw.subqueId
+        WHERE bcr.OrgID = $org_id
+          AND bcr.created_date BETWEEN '$firstDay' AND '$lastDay'
+        LIMIT 1
+    ) AS weightage;";
+$result = $conn->query($sql);
+$data = $result->fetch_assoc();
+$total_target = $data['total_target'] ?? 0;
+$total_survey_value = $data['total_survey_value'] ?? 0;
 
-// $weightage = $data['weightage'] ?? 0;
-// $cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
-// $cleanlinessrecordamount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
-//echo "Cleanliness Record Percentage: $cleanlinessRecordPercentage%";
+$weightage = $data['weightage'] ?? 0;
+$cleanlinessRecordPercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
+$cleanlinessrecordamount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
+// echo "chemical : $cleanlinessRecordPercentage%";
 
 // CLEANLINESS RECORD /performane log
 
@@ -195,7 +197,8 @@ while ($row = $result->fetch_assoc()) {
 
 
 
- echo $total_weightage;
+//  echo $weightagec ."<br>";
+//  echo     $weightage ."<br>";
 
 
 function calculatePerformanceConsumablesAmount($sactioned_amount, $weightagec, $firstDay) {
@@ -209,7 +212,7 @@ function calculatePerformanceConsumablesAmount($sactioned_amount, $weightagec, $
     return round($perDayAmount * $daysInMonth, 2);
 }
 $performanceConsumablesAmount = calculatePerformanceConsumablesAmount($bill['sactioned_amount'], $weightagec, $firstDay);
-echo "Performance Amount: $performanceConsumablesAmount";
+// echo "Performance Amount: $performanceConsumablesAmount";
 
 
 
@@ -265,56 +268,62 @@ $machineConsumablesAmount = calculatealreportAmount($bill['sactioned_amount'], $
 
 // calculate ATTENDANCE RECORDS OF THE STAFF 
 
-$sql="SELECT 
-    (
-        SELECT SUM(CAST(REPLACE(Bt.value, ',', '') AS UNSIGNED))
-        FROM baris_target AS Bt
-        WHERE Bt.OrgID = 17
-          AND Bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-          AND Bt.subqueId IN (
-              SELECT DISTINCT bcr.db_surveySubQuestionId
-              FROM  Manpower_Log_Details AS bcr
-              WHERE bcr.OrgID = 17
-                AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-          )
-    ) AS total_target,
+// $sql="SELECT 
+//     (
+//         SELECT SUM(CAST(REPLACE(Bt.value, ',', '') AS UNSIGNED))
+//         FROM baris_target AS Bt
+//         WHERE Bt.OrgID = $org_id
+//           AND Bt.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+//           AND Bt.subqueId IN (
+//               SELECT DISTINCT bcr.db_surveySubQuestionId
+//               FROM  Manpower_Log_Details AS bcr
+//               WHERE bcr.OrgID = $org_id
+//                 AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+//           )
+//     ) AS total_target,
 
-    (
-        SELECT 
-            SUM(bcr.db_surveyValue)
-        FROM  Manpower_Log_Details AS bcr
-        WHERE bcr.OrgID = 17
-          AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-    ) AS total_survey_value,
+//     (
+//         SELECT 
+//             SUM(bcr.db_surveyValue)
+//         FROM  Manpower_Log_Details AS bcr
+//         WHERE bcr.OrgID = $org_id
+//           AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+//     ) AS total_survey_value,
 
-    (
-        SELECT brw.weightage
-        FROM  Manpower_Log_Details AS bcr
-        INNER JOIN baris_report_weight brw 
-            ON bcr.db_surveySubQuestionId = brw.subqueId
-        WHERE bcr.OrgID = 17
-          AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
-        LIMIT 1
-    ) AS weightage";
-$result = $conn->query($sql);
-$data = $result->fetch_assoc();
-$total_target = $data['total_target'] ?? 0;
-$total_survey_value = $data['total_survey_value'] ?? 0;
-$weightage = $data['weightage'] ?? 0;
-$attendancePercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
-$attendanceAmount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
+//     (
+//         SELECT brw.weightage
+//         FROM  Manpower_Log_Details AS bcr
+//         INNER JOIN baris_report_weight brw 
+//             ON bcr.db_surveySubQuestionId = brw.subqueId
+//         WHERE bcr.OrgID = $org_id
+//           AND bcr.created_date BETWEEN '2025-01-01' AND '2025-01-31'
+//         LIMIT 1
+//     ) AS weightage";
+// $result = $conn->query($sql);
+// $data = $result->fetch_assoc();
+// $total_target = $data['total_target'] ?? 0;
+// $total_survey_value = $data['total_survey_value'] ?? 0;
+// $weightage = $data['weightage'] ?? 0;
+// $attendancePercentage = $total_target > 0 ? round(($total_survey_value / $total_target) * 100, 2) : 0;
+// $attendanceAmount = calculatealreportAmount($bill['sactioned_amount'], $weightage, $firstDay);
 //echo "Attendance Percentage: $attendancePercentage%";
 
 // Earnings & Deductions
+// $earnings = [
+//     ['ATTENDANCE RECORDS OF THE STAFF', "$weightage%", "$attendancePercentage%", "$attendanceAmount"],
+//     ['CLEANLINESS RECORD', "0", "0", "0"],
+//     ['USE OF TYPE AND QUANTITY OF CONSUMABLES', "0", "0", "0"],
+//     ['MACHINERY USAGE',"$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
+//     ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "$totalWeight%", "$overallAverage%", "$surpriseVisitAmount"],
+//     ['MACHINE CONSUMABLES', "$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
+//     ['PASSENGER FEEDBACK AND COMPLAINTS', "0", '0',"0"],
+// ];
 $earnings = [
-    ['ATTENDANCE RECORDS OF THE STAFF', "$weightage%", "$attendancePercentage%", "$attendanceAmount"],
-    ['CLEANLINESS RECORD', "0", "0", "0"],
-    ['USE OF TYPE AND QUANTITY OF CONSUMABLES', "0", "0", "0"],
-    ['MACHINERY USAGE',"$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
+    ['CLEANLINESS RECORD', "$weightagec%", "88%", "$performanceConsumablesAmount"],
     ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "$totalWeight%", "$overallAverage%", "$surpriseVisitAmount"],
-    ['MACHINE CONSUMABLES', "$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
-    ['PASSENGER FEEDBACK AND COMPLAINTS', "0", '0',"0"],
+    ['PASSENGER FEEDBACK AND COMPLAINTS', "30%", '80%',"0"],
 ];
+
 $earnings_total = array_sum(array_column($earnings, 3));
 $earnings_total = round($earnings_total, 2);
 // Consolidated score
@@ -395,23 +404,33 @@ function numberToWords($number) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PMC Bill Invoice</title>
+    <title>STATION CLEANING  Bill Invoice</title>
     <link rel="stylesheet" href="assets/css/billing.css">
 </head>
 <body>
-<form method="get" style="text-align:center; margin-bottom:20px;">
-    <label for="month">Month:</label>
-    <select name="month"><?php for ($m=1; $m<=12; $m++) {
-        $val = str_pad($m, 2, '0', STR_PAD_LEFT);
-        $sel = ($val == $selectedMonth) ? 'selected' : '';
-        echo "<option value=\"$val\" $sel>" . date('F', mktime(0, 0, 0, $m, 1)) . "</option>";
-    } ?></select>
-    <label for="year">Year:</label>
-    <select name="year"><?php for ($y=2020; $y<=date('Y')+2; $y++) {
-        $sel = ($y == $selectedYear) ? 'selected' : '';
-        echo "<option value=\"$y\" $sel>$y</option>";
-    } ?></select>
-    <input type="submit" value="Filter">
+<form method="get" class="filter-form" style="display:flex; justify-content:center; align-items:center; gap:16px; margin-bottom:24px; background:#f8f8f8; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+    <div>
+        <label for="month" style="font-weight:500; margin-right:8px;">Month:</label>
+        <select name="month" id="month" style="padding:6px 12px; border-radius:4px; border:1px solid #ccc;">
+            <?php for ($m=1; $m<=12; $m++) {
+                $val = str_pad($m, 2, '0', STR_PAD_LEFT);
+                $sel = ($val == $selectedMonth) ? 'selected' : '';
+                echo "<option value=\"$val\" $sel>" . date('F', mktime(0, 0, 0, $m, 1)) . "</option>";
+            } ?>
+        </select>
+    </div>
+    <div>
+        <label for="year" style="font-weight:500; margin-right:8px;">Year:</label>
+        <select name="year" id="year" style="padding:6px 12px; border-radius:4px; border:1px solid #ccc;">
+            <?php for ($y=2020; $y<=date('Y')+2; $y++) {
+                $sel = ($y == $selectedYear) ? 'selected' : '';
+                echo "<option value=\"$y\" $sel>$y</option>";
+            } ?>
+        </select>
+    </div>
+    <button type="submit" style="padding:8px 20px; background:#007bff; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; transition:background 0.2s;">
+        Filter
+    </button>
 </form>
 
 <!-- <div style="text-align:center;">
@@ -420,7 +439,7 @@ function numberToWords($number) {
 </div> -->
 
 <div class="container">
-    <h3 style="text-align:center;">PMC BILL INVOICE</h3>
+    <h3 style="text-align:center;">STATION CLEANING  BILL INVOICE</h3>
     <table>
         <tr><td colspan="2"><strong>PAYABLE AMOUNT DECRIPTION OF SANITATION WORK AT TIRUPATI STATION</strong></td></tr>
         <tr>
@@ -446,7 +465,7 @@ function numberToWords($number) {
                 <td><?= number_format($row[3], 2) ?></td>
             </tr>
         <?php endforeach; ?>
-        <tr><td>8</td><td>CONSOLIDATED PERFORMANCE SCORE</td><td colspan="2"><?= $consolidated_score ?></td><td></td></tr>
+        <tr><td></td><td>CONSOLIDATED PERFORMANCE SCORE</td><td colspan="2"><?= $consolidated_score ?></td><td></td></tr>
         <tr><th colspan="4">TOTAL</th><th><?= number_format($earnings_total, 2) ?></th></tr>
     </table>
 

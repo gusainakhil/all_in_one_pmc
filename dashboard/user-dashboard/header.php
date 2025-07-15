@@ -147,17 +147,21 @@ $result = $stmt->get_result();
                 $first = false;
               }
 
-              echo '<li class="nav-item">
-            <a href="' . htmlspecialchars($row["subqueType"]) . '.php?id=' . htmlspecialchars($row["report_id"]) . '" class="nav-link">
-                <i class="nav-icon bi bi-circle"></i>
-                <p>' . htmlspecialchars($row["subqueName"]) . '</p>
-            </a>
-          </li>';
+             
+echo '<li class="nav-item">
+        <a href="' . htmlspecialchars($row["subqueType"]) . '.php?id=' . htmlspecialchars($row["report_id"]) . '" class="nav-link"'
+        . ($row["subqueType"] === '../feedback/index' ? ' target="_blank"' : '') . '>
+            <i class="nav-icon bi bi-circle"></i>
+            <p>' . htmlspecialchars($row["subqueName"]) . '</p>
+        </a>
+      </li>';
+
+
             }
             ?>
 
             <li class="nav-item">
-              <a href="billing-invoice.php" class="nav-link">
+              <a href="billing-invoice.php" class="nav-link" target="_blank>
                 <i class="nav-icon bi bi-circle"></i>
                 <p>billig Invoice </p>
               </a>

@@ -686,7 +686,7 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
         <div class="mb-8">
           <h2 class="text-xl font-bold text-gray-800 mb-6">Current Month Report Data </h2>
 
-          <div class="card p-4 md:p-5">
+            <div class="card p-4 md:p-5">
             <div class="overflow-x-auto">
               <table class="w-full">
           <thead class="bg-gray-50">
@@ -734,7 +734,7 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
               </td>
             </tr>
             <tr>
-              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Mehsan
+              <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">Mehsana
               </td>
               <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
                 <span
@@ -765,7 +765,7 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
               </td>
             </tr>
             <!-- More rows as needed -->
-          </tbody>
+              </tbody>
               </table>
             </div>
           </div>
@@ -792,16 +792,16 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
               </div>
             </div>
 
-            <!-- Performance Distribution -->
+            <!-- Weekly Feedback Count Chart -->
             <div class="card p-4 md:p-5">
               <div class="flex items-center justify-between mb-4">
-                <h3 class="font-semibold text-lg">Performance by Category</h3>
+                <h3 class="font-semibold text-lg">Weekly Passenger Feedback Count</h3>
                 <button class="text-gray-400 hover:text-gray-600">
                   <i class="fas fa-ellipsis-h"></i>
                 </button>
               </div>
               <div style="height: 300px;">
-                <canvas id="staffDistributionChart"></canvas>
+                <canvas id="weeklyFeedbackChart"></canvas>
               </div>
             </div>
           </div>
@@ -950,165 +950,234 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
     Chart.defaults.maintainAspectRatio = false;
 
     // Station Performance Chart (Horizontal Bar)
-    const stationPerformanceCtx = document.getElementById('stationPerformanceChart').getContext('2d');
-    new Chart(stationPerformanceCtx, {
-      type: 'bar',
-      data: {
-        labels: ['Daily surprise visit Reports', 'Cleanliness report', 'Passenger Feedback'], // alig
-        datasets: [{
-          label: 'Overall Performance (%)',
-          data: [91, 86, 84], // Average of all metrics for each station
-          backgroundColor: '#0056b3',
-          borderWidth: 0,
-          borderRadius: 4,
-          maxBarThickness: 40
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        scales: {
-          x: {
-            beginAtZero: true,
-            max: 100,
-            grid: {
-              display: false
-            }
+    const stationPerformanceElement = document.getElementById('stationPerformanceChart');
+    if (stationPerformanceElement) {
+      try {
+        const stationPerformanceCtx = stationPerformanceElement.getContext('2d');
+        new Chart(stationPerformanceCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Daily surprise visit Reports', 'Cleanliness report', 'Passenger Feedback'],
+            datasets: [{
+              label: 'Overall Performance (%)',
+              data: [91, 86, 84], // Average of all metrics for each station
+              backgroundColor: '#0056b3',
+              borderWidth: 0,
+              borderRadius: 4,
+              maxBarThickness: 40
+            }]
           },
-          y: {
-            grid: {
-              display: false
+          options: {
+            indexAxis: 'y',
+            scales: {
+              x: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                grid: {
+                  display: false
+                }
+              }
             }
           }
-        }
+        });
+      } catch (error) {
+        console.error('Error initializing station performance chart:', error);
       }
-    });
+    }
 
-    // Performance by Category Chart (Doughnut)
-    const staffDistributionCtx = document.getElementById('staffDistributionChart').getContext('2d');
-    new Chart(staffDistributionCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['cleanliness report', 'Daily surprise visit Reports', 'Passenger Feedback'],
-        datasets: [{
-          data: [82, 87, 90, 87], // Overall averages from the table
-          backgroundColor: [
-            '#0056b3',
-            '#3b82f6',
-            '#1e4620',
-            '#ff6b01'
-          ],
-          borderWidth: 0,
-          hoverOffset: 10
-        }]
-      },
-      options: {
-        cutout: '65%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              boxWidth: 12,
-              usePointStyle: true,
-              pointStyle: 'circle'
+    // Weekly Passenger Feedback Count Chart (Bar Chart)
+    const weeklyFeedbackElement = document.getElementById('weeklyFeedbackChart');
+    if (weeklyFeedbackElement) {
+      try {
+        const weeklyFeedbackCtx = weeklyFeedbackElement.getContext('2d');
+        new Chart(weeklyFeedbackCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+              label: 'Passenger Feedback Count',
+              data: [120, 150, 180, 200],
+              backgroundColor: [
+                '#3b82f6',
+                '#10b981', 
+                '#f59e0b',
+                '#ef4444'
+              ],
+              borderWidth: 0,
+              borderRadius: 6,
+              maxBarThickness: 50
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 50
+                },
+                grid: {
+                  color: '#f3f4f6'
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  font: {
+                    weight: 'bold'
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                callbacks: {
+                  label: function(context) {
+                    return context.dataset.label + ': ' + context.parsed.y + ' feedbacks';
+                  }
+                }
+              }
             }
           }
-        }
+        });
+      } catch (error) {
+        console.error('Error initializing weekly feedback chart:', error);
       }
-    });
+    }
 
     // Monthly Performance Trend Chart (Line)
-    const punctualityCtx = document.getElementById('punctualityChart').getContext('2d');
-    new Chart(punctualityCtx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Overall Performance (%)',
-          data: [84, 86, 88, 85, 87, 88], // Adjusted to match overall performance of 88%
-          borderColor: '#0056b3',
-          backgroundColor: 'rgba(0, 86, 179, 0.1)',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.3
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: false,
-            min: 80,
-            max: 100,
-            ticks: {
-              stepSize: 5
+    const punctualityElement = document.getElementById('punctualityChart');
+    if (punctualityElement) {
+      try {
+        const punctualityCtx = punctualityElement.getContext('2d');
+        new Chart(punctualityCtx, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+              label: 'Overall Performance (%)',
+              data: [84, 86, 88, 85, 87, 88], // Adjusted to match overall performance of 88%
+              borderColor: '#0056b3',
+              backgroundColor: 'rgba(0, 86, 179, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: false,
+                min: 80,
+                max: 100,
+                ticks: {
+                  stepSize: 5
+                }
+              }
             }
           }
-        }
+        });
+      } catch (error) {
+        console.error('Error initializing punctuality chart:', error);
       }
-    });
+    }
 
     // Performance by Station Chart (Radar)
-    const safetyCtx = document.getElementById('safetyChart').getContext('2d');
-    new Chart(safetyCtx, {
-      type: 'radar',
-      data: {
-        labels: ['Daily Visit', 'Machine Reports', 'Cleanliness', 'Passenger Feedback'],
-        align: 'end',
-        datasets: [{
-          label: 'Ahmedabad',
-          data: [85, 91, 100, 89], // Ahmedabad data from table
-          backgroundColor: 'rgba(0, 86, 179, 0.2)',
-
-          borderColor: '#0056b3',
-          borderWidth: 2,
-          pointBackgroundColor: '#0056b3'
-        }, {
-          label: 'Vadodara',
-          data: [82, 87, 90, 86], // Vadodara data from table
-          backgroundColor: 'rgba(107, 114, 128, 0.2)',
-          borderColor: '#6b7280',
-          borderWidth: 1,
-          pointBackgroundColor: '#6b7280'
-        }, {
-          label: 'Surat',
-          data: [80, 83, 88, 85], // Surat data from table
-          backgroundColor: 'rgba(255, 107, 1, 0.2)',
-          borderColor: '#ff6b01',
-          borderWidth: 1,
-          pointBackgroundColor: '#ff6b01'
-        }]
-      },
-      options: {
-        scales: {
-          r: {
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              display: false,
-              stepSize: 20
+    const safetyElement = document.getElementById('safetyChart');
+    if (safetyElement) {
+      try {
+        const safetyCtx = safetyElement.getContext('2d');
+        new Chart(safetyCtx, {
+          type: 'radar',
+          data: {
+            labels: ['Daily Visit', 'Machine Reports', 'Cleanliness', 'Passenger Feedback'],
+            align: 'mid',
+            datasets: [{
+              label: 'Ahmedabad',
+              data: [85, 91, 100, 89], // Ahmedabad data from table
+              backgroundColor: 'rgba(0, 86, 179, 0.2)',
+              borderColor: '#0056b3',
+              borderWidth: 2,
+              pointBackgroundColor: '#0056b3'
+            }, {
+              label: 'Vadodara',
+              data: [82, 87, 90, 86], // Vadodara data from table
+              backgroundColor: 'rgba(107, 114, 128, 0.2)',
+              borderColor: '#6b7280',
+              borderWidth: 1,
+              pointBackgroundColor: '#6b7280'
+            }, {
+              label: 'Surat',
+              data: [80, 83, 88, 85], // Surat data from table
+              backgroundColor: 'rgba(255, 107, 1, 0.2)',
+              borderColor: '#ff6b01',
+              borderWidth: 1,
+              pointBackgroundColor: '#ff6b01'
+            }]
+          },
+          options: {
+            scales: {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  display: false,
+                  stepSize: 20
+                }
+              }
             }
           }
-        }
+        });
+      } catch (error) {
+        console.error('Error initializing safety radar chart:', error);
       }
-    });
+    }
 
     // Performance Rating Range Chart (Pie)
-    const infrastructureCtx = document.getElementById('infrastructureChart').getContext('2d');
-    new Chart(infrastructureCtx, {
-      type: 'pie',
-      data: {
-        labels: ['Excellent', 'Good', 'Fair', 'Needs Attention'],
-        datasets: [{
-          data: [15, 55, 25, 5], // Adjusted based on the performance metrics
-          backgroundColor: [
-            '#10b981',
-            '#3b82f6',
-            '#f59e0b',
-            '#ef4444'
-          ],
-          borderWidth: 0
-        }]
+    const infrastructureElement = document.getElementById('infrastructureChart');
+    if (infrastructureElement) {
+      try {
+        const infrastructureCtx = infrastructureElement.getContext('2d');
+        new Chart(infrastructureCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Excellent', 'Good', 'Fair', 'Needs Attention'],
+            datasets: [{
+              data: [15, 55, 25, 5], // Adjusted based on the performance metrics
+              backgroundColor: [
+                '#10b981',
+                '#3b82f6',
+                '#f59e0b',
+                '#ef4444'
+              ],
+              borderWidth: 0
+            }]
+          }
+        });
+      } catch (error) {
+        console.error('Error initializing infrastructure pie chart:', error);
       }
-    });
+    }
 
     // Mobile menu toggle
     document.addEventListener('DOMContentLoaded', function () {

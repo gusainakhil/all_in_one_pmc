@@ -188,37 +188,37 @@ $dateRange = new DatePeriod($start, $interval, $end);
           <div class="row">
                <div class="col-lg-7 mb-3">
               <div class="performance-container p-3">
-                <form method="get" class="no-print">
-                  <div class="d-flex flex-wrap gap-2 align-items-end">
-                    <div class="flex-grow-1">
-                      <!-- <label for="from_date" class="form-label mb-1">From Date</label> -->
-                      <input type="date" name="from_date" id="from_date" class="form-control" value="<?= htmlspecialchars($fromDate) ?>">
+                <div class="d-flex justify-content-center align-items-center mb-3">
+                  <form method="get" class="no-print w-100" style="max-width: 500px;">
+                    <div class="row g-2 align-items-end">
+                      <div class="col">
+                        <input type="date" name="from_date" id="from_date" class="form-control" value="<?= htmlspecialchars($fromDate) ?>">
+                      </div>
+                      <div class="col">
+                        <input type="date" name="to_date" id="to_date" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
+                      </div>
+                      <div class="col-auto">
+                        <button type="submit" class="btn btn-success px-4">
+                          <i class="fas fa-sync-alt me-1"></i> Go
+                        </button>
+                      </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <!-- <label for="to_date" class="form-label mb-1">To Date</label> -->
-                      <input type="date" name="to_date" id="to_date" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
-                    </div>
-                    <div>
-                      <button type="submit" class="btn btn-success px-4">
-                        <i class="fas fa-sync-alt me-1"></i> Go
-                      </button>
-                    </div>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
             <div class="col-lg-5 mb-3">
               <div class="performance-container p-3">
                 <div class="action-buttons no-print">
-                  <!-- <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
+                   <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
                     <i class="fas fa-chart-pie"></i> Summary
-                  </a> -->
-                  <a href="daily_performance_summary_2.php?id=<?php echo $id; ?>" class="btn btn-success" target="_blank">
-                    <i class="fas fa-chart-bar"></i> Summary2 
-                  </a>
-                  <!-- <a href="daily_performance_report.php" target="_blank" class="btn btn-success">
-                    <i class="fas fa-file-alt"></i> Daily Performance Log
-                  </a> -->
+                  </a> 
+                  <!--<a href="daily_performance_summary_2.php?id=<?php echo $id; ?>" class="btn btn-success" target="_blank">-->
+                  <!--  <i class="fas fa-chart-bar"></i> Summary2 -->
+                  <!--</a>-->
+                  <!-- <a href="daily_performance_report.php" target="_blank" class="btn btn-success">-->
+                  <!--  <i class="fas fa-file-alt"></i> Daily Performance Log-->
+                  <!--</a> -->
                   <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
                     <i class="fas fa-bullseye"></i> Daily Performance Target
                   </a>
@@ -232,7 +232,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
           <!-- Loading indicator -->
           <div id="loading-indicator" class="loading no-print">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2">Loading performance data...</p>
+            <p class="mt-2">Calculating  performance data...</p>
           </div>
           
           <!-- Report Container - will be shown after loading -->
