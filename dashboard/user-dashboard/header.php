@@ -161,7 +161,7 @@ echo '<li class="nav-item">
             ?>
 
             <li class="nav-item">
-              <a href="billing-invoice.php" class="nav-link" target="_blank>
+              <a href="billing-invoice.php" class="nav-link" target="_blank">
                 <i class="nav-icon bi bi-circle"></i>
                 <p>billig Invoice </p>
               </a>
@@ -181,12 +181,12 @@ echo '<li class="nav-item">
         <!--    <p>equipments</p>-->
         <!--  </a>-->
         <!--</li>-->
-        <!--<li class="nav-item">-->
-        <!--  <a href="photo-report.php" class="nav-link">-->
-        <!--    <i class="nav-icon bi bi-circle"></i>-->
-        <!--    <p>Photo Report </p>-->
-        <!--  </a>-->
-        <!--</li>-->
+        <li class="nav-item">
+          <a href="photo-report.php" class="nav-link">
+            <i class="nav-icon bi bi-circle"></i>
+            <p>Photo Report </p>
+          </a>
+        </li>
       </ul>
       <!--end::Sidebar Menu-->
     </nav>

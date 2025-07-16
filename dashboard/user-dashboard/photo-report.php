@@ -30,11 +30,14 @@ $period = new DatePeriod(
             font-size: 12px;
             font-weight: 400;
             box-sizing: border-box;
+            padding: 0 10px;
         }
         .railway-container {
-            width: 95%;
+            width: 100%;
+            max-width: 1200px;
             margin: auto;
             page-break-after: always;
+            margin-bottom: 20px;
         }
         .railway-section-title {
             text-align: center;
@@ -42,34 +45,159 @@ $period = new DatePeriod(
             font-size: 16px;
             margin: 20px 0 10px;
             text-transform: uppercase;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        
+        /* Mobile adjustments for container */
+        @media screen and (max-width: 768px) {
+            .railway-frame {
+                padding: 0 5px;
+                height: auto;
+                overflow-y: visible;
+            }
+            .railway-container {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            .railway-section-title {
+                font-size: 14px;
+                padding: 8px;
+                margin: 10px 0 5px;
+            }
         }
         .photo-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            display: table;
         }
         .photo-table th,
         .photo-table td {
             border: 1px solid #000;
             vertical-align: top;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
+            word-wrap: break-word;
+            width: 50%;
+            min-height: 350px;
+            height: auto;
         }
         .photo-table th {
             background-color: #f2f2f2;
             font-size: 14px;
+            font-weight: bold;
+            padding: 12px;
+            height: 50px;
         }
         .photo-img {
-            max-width: 100%;
             width: 280px;
-            height: auto;
+            height: 200px;
+            object-fit: cover;
             margin-bottom: 5px;
             border: 1px solid #ccc;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .photo-info {
             font-size: 12px;
             text-align: left;
             margin-top: 5px;
+            padding: 5px;
+            background-color: #f9f9f9;
+            border-radius: 3px;
+        }
+        
+        /* Mobile Responsive */
+        @media screen and (max-width: 768px) {
+            .photo-table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .photo-table thead {
+                display: none;
+            }
+            .photo-table tbody {
+                display: block;
+                width: 100%;
+            }
+            .photo-table tr {
+                display: block;
+                margin-bottom: 20px;
+                border: 1px solid #000;
+                background-color: #fff;
+                min-height: 300px;
+            }
+            .photo-table td {
+                display: block;
+                width: 100%;
+                text-align: left;
+                border: none;
+                border-bottom: 1px solid #ddd;
+                padding: 15px;
+                position: relative;
+                padding-left: 50%;
+                min-height: 280px;
+                box-sizing: border-box;
+            }
+            .photo-table td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #333;
+            }
+            .photo-img {
+                width: 200px;
+                height: 150px;
+                object-fit: cover;
+            }
+            .photo-info {
+                font-size: 11px;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Tablet Responsive */
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            .photo-table td {
+                padding: 12px;
+                min-height: 320px;
+            }
+            .photo-table th {
+                padding: 10px;
+            }
+            .photo-img {
+                width: 220px;
+                height: 160px;
+                object-fit: cover;
+            }
+            .photo-info {
+                font-size: 11px;
+            }
+        }
+        
+        /* Large Screen */
+        @media screen and (min-width: 1025px) {
+            .photo-table td {
+                padding: 20px;
+                min-height: 380px;
+            }
+            .photo-table th {
+                padding: 15px;
+            }
+            .photo-img {
+                width: 300px;
+                height: 220px;
+                object-fit: cover;
+            }
         }
         .railway-filter-form {
             display: flex;
@@ -78,9 +206,14 @@ $period = new DatePeriod(
             flex-wrap: wrap;
             margin: 15px auto;
             width: fit-content;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
         .railway-filter-form label {
             font-weight: 500;
+            margin-right: 5px;
         }
         .railway-filter-form input[type="date"],
         .railway-filter-form button {
@@ -94,6 +227,33 @@ $period = new DatePeriod(
             color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .railway-filter-form button:hover {
+            background-color: darkgreen;
+        }
+        
+        /* Mobile filter form */
+        @media screen and (max-width: 768px) {
+            .railway-filter-form {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                margin: 10px;
+                padding: 10px;
+            }
+            .railway-filter-form input[type="date"],
+            .railway-filter-form button {
+                width: 100%;
+                max-width: 250px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            .railway-filter-form label {
+                text-align: center;
+                display: block;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -152,10 +312,10 @@ $period = new DatePeriod(
                         echo "<tr>";
 
                         // Before Photo
-                        echo "<td>";
+                        echo "<td data-label='Before Photo'>";
                         if ($beforeRow) {
                             $beforeImg = !empty($beforeRow['imagename']) ? "../../uploads/photos/" . $beforeRow['imagename'] : "../../uploads/photos/no-image.jpg";
-                            echo "<img src='$beforeImg' class='photo-img'>";
+                            echo "<img src='$beforeImg' class='photo-img' alt='Before Photo'>";
                             echo "<div class='photo-info'>";
                             echo "<strong>User ID:</strong> {$beforeRow['db_surveyUserid']}<br>";
                             echo "<strong>Process:</strong> {$beforeRow['db_process_type']}<br>";
@@ -168,10 +328,10 @@ $period = new DatePeriod(
                         echo "</td>";
 
                         // After Photo
-                        echo "<td>";
+                        echo "<td data-label='After Photo'>";
                         if ($afterRow) {
                             $afterImg = !empty($afterRow['imagename']) ? "../../uploads/photos/" . $afterRow['imagename'] : "../../uploads/photos/no-image.jpg";
-                            echo "<img src='$afterImg' class='photo-img'>";
+                            echo "<img src='$afterImg' class='photo-img' alt='After Photo'>";
                             echo "<div class='photo-info'>";
                             echo "<strong>User ID:</strong> {$afterRow['db_surveyUserid']}<br>";
                             echo "<strong>Process:</strong> {$afterRow['db_process_type']}<br>";
@@ -194,7 +354,7 @@ $period = new DatePeriod(
         </div>
     </main>
     <footer class="app-footer">
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
+        
         <strong>&copy; 2025</strong> All rights reserved.
     </footer>
 </div>

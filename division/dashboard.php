@@ -50,11 +50,208 @@ echo $ownerCount;
 $stmt->close();
 
 // Sample railway-specific data (in a real system, these would come from DB)
-$totalStations = 3;
-$trainsOperational = 5;
-$totalStaff = 15;
-$punctualityRate = 94.5;
+// $totalStations = 3;
+// $trainsOperational = 5;
+// $totalStaff = 15;
+// $punctualityRate = 94.5;
 ?>
+<?php
+function calculate_division_psi($conn, $division_id) {
+    // Dates: current month start to today
+    $firstDay = date('Y-m-01');
+    $lastDay  = date('Y-m-d'); // today
+
+    try {
+        // Fetch all stations in division
+        $sql_stations = "SELECT id, name, feedback_target FROM feedback_stations WHERE division = ?";
+        $stmt_stations = $conn->prepare($sql_stations);
+        $stmt_stations->bind_param("i", $division_id);
+        $stmt_stations->execute();
+        $result_stations = $stmt_stations->get_result();
+
+        $division_stations = [];
+        $total_daily_target = 0;
+
+        while ($station = $result_stations->fetch_assoc()) {
+            $division_stations[] = $station;
+            $total_daily_target += (int) ($station['feedback_target'] ?? 0);
+        }
+        $stmt_stations->close();
+
+        if (empty($division_stations)) {
+            echo "<h2>No stations found in Division " . htmlspecialchars($division_id) . "</h2>";
+            return;
+        }
+
+        // Fetch max rating score from first station (assuming same for all)
+        $first_station_id = $division_stations[0]['id'];
+        $stmt_max = $conn->prepare("SELECT value FROM rating_parameters WHERE station_id = ?");
+        $stmt_max->bind_param("i", $first_station_id);
+        $stmt_max->execute();
+        $max_result = $stmt_max->get_result();
+        $max_rating_score = (int) ($max_result->fetch_assoc()['value'] ?? 3);
+        $stmt_max->close();
+
+        // Prepare station IDs for SQL IN clause
+        $station_ids = array_column($division_stations, 'id');
+        $placeholders = implode(',', array_fill(0, count($station_ids), '?'));
+
+        // Fetch feedback data for current month
+        $sql_feedback = "
+            SELECT ff.id AS form_id, ff.station_id, ff.created_at,
+                   GROUP_CONCAT(CONCAT(fa.question_id, ':', fa.rating)) AS question_ratings
+            FROM feedback_form ff
+            LEFT JOIN feedback_answers fa ON ff.id = fa.feedback_form_id
+            WHERE ff.station_id IN ($placeholders)
+            AND DATE(ff.created_at) BETWEEN ? AND ?
+            GROUP BY ff.id
+        ";
+        $stmt_feedback = $conn->prepare($sql_feedback);
+        $types = str_repeat('i', count($station_ids)) . 'ss';
+        $params = array_merge($station_ids, [$firstDay, $lastDay]);
+        $stmt_feedback->bind_param($types, ...$params);
+        $stmt_feedback->execute();
+        $feedback_data = $stmt_feedback->get_result();
+
+        // Process feedback data
+        $total_feedbacks = 0;
+        $total_score_sum = 0;
+        while ($row = $feedback_data->fetch_assoc()) {
+            $ratings = explode(',', $row['question_ratings']);
+            $sum = 0;
+            $count = 0;
+            foreach ($ratings as $rating_pair) {
+                [$q, $r] = explode(':', $rating_pair);
+                $sum += (int) $r;
+                $count++;
+            }
+            if ($count > 0) {
+                $avg = $sum / $count;
+                $total_score_sum += $avg;
+                $total_feedbacks++;
+            }
+        }
+        $stmt_feedback->close();
+
+        // PSI calculation
+        $start_date = new DateTime($firstDay);
+        $current_date = new DateTime($lastDay);
+        $days_passed = $start_date->diff($current_date)->days + 1;
+
+        $expected_feedbacks = $days_passed * $total_daily_target;
+
+        $avg_score = $total_feedbacks > 0 ? $total_score_sum / $total_feedbacks : 0;
+        $quality_psi = ($avg_score / $max_rating_score) * 100;
+        $quantity_achievement = $expected_feedbacks > 0 ? ($total_feedbacks / $expected_feedbacks) : 0;
+
+        $division_psi = $quality_psi * $quantity_achievement;
+
+        // Output
+        echo  number_format($division_psi, 1);
+
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+    }
+}
+
+// Example call:
+// $division_id = 30;
+
+
+
+// station wise  
+function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
+    // Print station id
+    // echo "Station ID: $station_id\n";
+
+    try {
+        // Fetch station
+        $stmt_station = $conn->prepare("SELECT name, feedback_target FROM feedback_stations WHERE id = ?");
+        $stmt_station->bind_param("i", $station_id);
+        $stmt_station->execute();
+        $station_result = $stmt_station->get_result();
+        $station = $station_result->fetch_assoc();
+        $stmt_station->close();
+
+        if (!$station) {
+            throw new Exception("Station not found");
+        }
+
+        $station_name = $station['name'];
+        $daily_target = (int)($station['feedback_target'] ?? 0);
+
+        // Get max rating score
+        $stmt_max = $conn->prepare("SELECT value FROM rating_parameters WHERE station_id = ?");
+        $stmt_max->bind_param("i", $station_id);
+        $stmt_max->execute();
+        $max_result = $stmt_max->get_result();
+        $max_rating_score = (int)($max_result->fetch_assoc()['value'] ?? 3);
+        $stmt_max->close();
+
+        // Fetch feedback
+        $stmt_feedback = $conn->prepare("
+            SELECT GROUP_CONCAT(CONCAT(fa.question_id, ':', fa.rating)) AS question_ratings
+            FROM feedback_form ff
+            LEFT JOIN feedback_answers fa ON ff.id = fa.feedback_form_id
+            WHERE ff.station_id = ?
+            AND DATE(ff.created_at) BETWEEN ? AND ?
+            GROUP BY ff.id
+        ");
+        $stmt_feedback->bind_param("iss", $station_id, $firstDay, $lastDay);
+        $stmt_feedback->execute();
+        $feedback_result = $stmt_feedback->get_result();
+
+        $total_feedbacks = 0;
+        $total_score_sum = 0;
+
+        while ($row = $feedback_result->fetch_assoc()) {
+            $ratings = explode(',', $row['question_ratings']);
+            $sum = 0;
+            $count = 0;
+            foreach ($ratings as $rating_pair) {
+                [$q, $r] = explode(':', $rating_pair);
+                $sum += (int)$r;
+                $count++;
+            }
+            if ($count > 0) {
+                $avg = $sum / $count;
+                $total_score_sum += $avg;
+                $total_feedbacks++;
+            }
+        }
+
+        $stmt_feedback->close();
+
+        // PSI Calculation
+        $start = new DateTime($firstDay);
+        $end = new DateTime($lastDay);
+        $end->modify('+1 day');
+        $interval = new DateInterval('P1D');
+        $total_days = iterator_count(new DatePeriod($start, $interval, $end));
+
+        $expected_feedbacks = $total_days * $daily_target;
+        $avg_score = $total_feedbacks > 0 ? $total_score_sum / $total_feedbacks : 0;
+        $quality_psi = ($avg_score / $max_rating_score) * 100;
+        $quantity_achievement = $expected_feedbacks > 0 ? ($total_feedbacks / $expected_feedbacks) : 0;
+        $psi = $quality_psi * $quantity_achievement;
+
+        // Final Output
+        // echo $station_name . ' - ' . number_format($psi, 2) . "%\n";
+        echo  number_format($psi, 2);
+
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage() . "\n";
+    }
+}
+
+// Example call:
+// $station_id = 33;
+
+// $conn already declared outside
+// calculate_feedback_psi($conn, 33, $firstDay, $lastDay);
+
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -352,8 +549,7 @@ $punctualityRate = 94.5;
               <div>
                 <div class="text-2xl font-bold">
                   <?php
-                  $num2 = rand(85, 87);
-                  echo $num2;
+                  calculate_division_psi($conn, $division_id);
                   ?>%
                 </div>
                 <div class="text-sm opacity-80">Passenger Feedback</div>
@@ -570,6 +766,19 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
 
 
           ?>
+          
+         
+
+
+<!--/// feedback station wise-->
+
+<?php
+
+?>
+
+          
+          
+          
           <!-- Stat Cards this box for cl Cleanliness  Reports-->
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 md:gap-6">
@@ -612,9 +821,8 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
               <div class="mt-2">
                 <h3 class="text-3xl font-bold">
                   <?php
-
-                  $num2 = rand(85, 87);
-                  echo $num2;
+                    calculate_division_psi($conn, $division_id);
+               
 
                   ?>%
                 </h3>
@@ -727,8 +935,7 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
                 <span
             class="<?php echo (85 < 85) ? 'text-red-600' : ((92 >= 85 && 92 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
             <?php
-            $num2 = rand(85, 87);
-            echo $num2;
+            calculate_feedback_psi($conn, 33, $firstDay, $lastDay);
             ?>%
                 </span>
               </td>
@@ -757,10 +964,9 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
               <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-center">
                 <span
             class="<?php echo (85 < 85) ? 'text-red-600' : ((92 >= 85 && 92 <= 95) ? 'text-yellow-600' : 'text-green-600'); ?>">
-            <?php
-            $num2 = rand(85, 87);
-            echo $num2;
-            ?>%
+             <?php
+            calculate_feedback_psi($conn, 35, $firstDay, $lastDay);
+            ?>%%
                 </span>
               </td>
             </tr>
