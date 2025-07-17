@@ -1,11 +1,13 @@
-
 <!-- Sidebar -->
 <div class="sidebar-wrapper">
   <!-- Mobile sidebar overlay -->
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden transition-opacity duration-300"></div>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden transition-opacity duration-300">
+  </div>
 
   <!-- Actual sidebar -->
-  <aside class="fixed w-64 bg-gray-900 text-white h-screen overflow-y-auto left-0 top-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl z-30" id="sidebar">
+  <aside
+    class="fixed w-64 bg-gray-900 text-white h-screen overflow-y-auto left-0 top-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl z-30"
+    id="sidebar">
     <!-- IR Logo Header -->
     <div class="py-4 px-4 bg-blue-800 border-b border-blue-700">
       <div class="flex items-center justify-between">
@@ -23,7 +25,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- User Profile -->
     <div class="px-4 py-3 border-b border-gray-800">
       <div class="flex items-center">
@@ -36,7 +38,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Navigation -->
     <nav class="p-3">
       <!-- Main menu items -->
@@ -45,25 +47,41 @@
           <i class="fas fa-tachometer-alt w-5 mr-3"></i>
           <span>Dashboard</span>
         </a>
-        
-    
-        
-        <a href="list-station.php" class="flex items-center px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">
+
+        <a href="list-station.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
           <i class="fas fa-building w-5 mr-3"></i>
-          <span>Stations</span>
+          <span>Stations Login</span>
         </a>
- 
-  
-        
+
+        <a href="create-chi.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+          <span>Create CHI Dashboard</span>
+        </a>
+
+        <a href="create-contractor.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-users w-5 mr-3"></i>
+          <span>Create Contractor</span>
+        </a>
+
+        <a href="create-auditor.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-user-check w-5 mr-3"></i>
+          <span>Create Auditor</span>
+        </a>
+
+
         <!--<a href="reports.php" class="flex items-center px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">-->
         <!--  <i class="fas fa-chart-line w-5 mr-3"></i>-->
         <!--  <span>Reports</span>-->
         <!--</a>-->
       </div>
-      
+
       <!-- Divider -->
       <div class="my-4 border-t border-gray-800"></div>
-      
+
       <!-- System menu -->
       <!--<div class="space-y-1">-->
       <!--  <a href="alerts.php" class="flex items-center justify-between px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">-->
@@ -73,22 +91,23 @@
       <!--    </div>-->
       <!--    <span class="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>-->
       <!--  </a>-->
-        
+
       <!--  <a href="settings.php" class="flex items-center px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">-->
       <!--    <i class="fas fa-cog w-5 mr-3"></i>-->
       <!--    <span>Settings</span>-->
       <!--  </a>-->
-        
+
       <!--  <a href="help.php" class="flex items-center px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">-->
       <!--    <i class="fas fa-question-circle w-5 mr-3"></i>-->
       <!--    <span>Help</span>-->
       <!--  </a>-->
       <!--</div>-->
     </nav>
-    
+
     <!-- Logout button at bottom -->
     <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-      <a href="logout.php" class="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors">
+      <a href="logout.php"
+        class="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors">
         <i class="fas fa-sign-out-alt mr-2"></i>
         <span>Logout</span>
       </a>
@@ -97,49 +116,49 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     // Get DOM elements
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const closeSidebarBtn = document.getElementById('close-sidebar');
-    
+
     // Function to toggle sidebar on mobile
     function toggleSidebar() {
       sidebar.classList.toggle('-translate-x-full');
       sidebarOverlay.classList.toggle('hidden');
-      
+
       if (!sidebar.classList.contains('-translate-x-full')) {
         document.body.classList.add('overflow-hidden');
       } else {
         document.body.classList.remove('overflow-hidden');
       }
     }
-    
+
     // Event listeners
     if (closeSidebarBtn) {
       closeSidebarBtn.addEventListener('click', toggleSidebar);
     }
-    
+
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener('click', toggleSidebar);
     }
-    
+
     // Expose toggle function for dashboard.php
     window.toggleSidebar = toggleSidebar;
-    
+
     // Set active menu item based on current page
     const menuItems = document.querySelectorAll('nav a');
     const currentPage = window.location.pathname.split('/').pop();
-    
+
     menuItems.forEach(item => {
       if (item.getAttribute('href') === currentPage) {
         item.classList.remove('text-gray-300', 'hover:bg-gray-800');
         item.classList.add('bg-blue-700', 'text-white');
       }
     });
-    
+
     // Handle window resize
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       if (window.innerWidth >= 768) {
         sidebar.classList.remove('-translate-x-full');
         sidebarOverlay.classList.add('hidden');
@@ -150,7 +169,7 @@
         sidebar.classList.add('-translate-x-full');
       }
     });
-    
+
     // Initialize correct state based on screen size
     if (window.innerWidth < 768) {
       sidebar.classList.add('-translate-x-full');

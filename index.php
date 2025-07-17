@@ -41,7 +41,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif ($row['db_usertype'] == 'owner') {
                 header("Location: dashboard/user-dashboard/index.php");
                 exit();
-            } else {
+                
+                
+            } 
+            
+            elseif ($row['db_usertype'] == 'Division') {
+                header("Location: division/dashboard.php");
+                exit();
+                
+                
+                
+            } 
+            
+            
+            else {
                 echo "<script>alert('You are logged in but do not have access to this area.');</script>";
             }
         } else {

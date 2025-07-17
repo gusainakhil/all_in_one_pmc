@@ -9,9 +9,9 @@ if ($conn->connect_error) {
 }
 // add user in database
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Your POST handling code here
-    $db_userLoginName = $_POST['db_userLoginName'];
-    $db_username = $_POST['db_username'];
+    // Handle POST data for required fields only
+    $db_userLoginName = $_POST['db_username']; 
+    $db_username = $_POST['db_userLoginName'];
     // Hash the password before storing
     $db_password = password_hash($_POST['db_password'], PASSWORD_DEFAULT);
     $db_phone = $_POST['db_phone'];
@@ -20,23 +20,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $db_designation = $_POST['db_designation'];
     $reportType = $_POST['reportType'];
     $OrgID = $_POST['OrgID'];
-    $DivisionId = $_POST['DivisionId'];
-    $StationId = $_POST['StationId'];
-    $db_valid_from = $_POST['db_valid_from'];
-    $db_valid = $_POST['db_valid'];
-    $paid_amount = $_POST['paid_amount'];
-    $gst_amount = $_POST['gst_amount'];
-    $total_paid_amount = $_POST['total_paid_amount'];
-    $renewal_amount = $_POST['renewal_amount'];
-    $renewal_gst_amount = $_POST['renewal_gst_amount'];
-    $renewal_total_amount = $_POST['renewal_total_amount'];
+    $DivisionId = 30; // Fixed Division ID
+    $StationId = $_POST['OrgID']; // Use OrgID as StationId
     $login_token = $_POST['login_token'];
 
-    try {
-        // Prepare and bind
-        $stmt = $conn->prepare("INSERT INTO baris_userlogin (db_userLoginName, db_username, db_password, db_phone, db_email, db_usertype, db_designation, reportType, OrgID, DivisionId, StationId, db_valid_from, db_valid, paid_amount, gst_amount, total_paid_amount, renewal_amount, renewal_gst_amount, renewal_total_amount, login_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    // Get OrgName from the station table
+    $OrgName = null;
+    $stationQuery = $conn->prepare("SELECT stationName FROM baris_station WHERE stationId = ?");
+    $stationQuery->bind_param("i", $OrgID);
+    $stationQuery->execute();
+    $stationResult = $stationQuery->get_result();
+    if ($stationResult && $stationResult->num_rows > 0) {
+        $stationRow = $stationResult->fetch_assoc();
+        $OrgName = $stationRow['stationName'];
+    }
+    $stationQuery->close();
 
-        $stmt->bind_param("sssssssissssssssssss", $db_userLoginName, $db_username, $db_password, $db_phone, $db_email, $db_usertype, $db_designation, $reportType, $OrgID, $DivisionId, $StationId, $db_valid_from, $db_valid, $paid_amount, $gst_amount, $total_paid_amount, $renewal_amount, $renewal_gst_amount, $renewal_total_amount, $login_token);
+    // Set default values for fields not in the form
+    $db_valid_from = date('Y-m-d H:i:s');
+    $db_valid = date('Y-m-d H:i:s', strtotime('+1 year'));
+    $paid_amount = 0.0;
+    $gst_amount = 0.0;
+    $total_paid_amount = 0.0;
+    $renewal_amount = 0.0;
+    $renewal_gst_amount = 0.0;
+    $renewal_total_amount = 0.0;
+    $LastLogin = null; // Will be set when user logs in
+
+
+    try {
+        // Prepare and bind - include OrgName and LastLogin
+        $stmt = $conn->prepare("INSERT INTO baris_userlogin (db_userLoginName, db_username, db_password, db_phone, db_email, db_usertype, db_designation, reportType, OrgID, OrgName, DivisionId, StationId, db_valid_from, db_valid, paid_amount, gst_amount, total_paid_amount, renewal_amount, renewal_gst_amount, renewal_total_amount, LastLogin, login_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        $stmt->bind_param("ssssssssisiissddddddss", $db_userLoginName, $db_username, $db_password, $db_phone, $db_email, $db_usertype, $db_designation, $reportType, $OrgID, $OrgName, $DivisionId, $StationId, $db_valid_from, $db_valid, $paid_amount, $gst_amount, $total_paid_amount, $renewal_amount, $renewal_gst_amount, $renewal_total_amount, $LastLogin, $login_token);
 
         if ($stmt->execute()) {
             $successMsg = "User created successfully";
@@ -171,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button id="mobile-menu-button" class="mr-4 text-gray-600 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1 class="text-xl font-bold text-gray-800">Create User</h1>
+                    <h1 class="text-xl font-bold text-gray-800">Create CHI</h1>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -234,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <li aria-current="page">
                             <div class="flex items-center">
                                 <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                                <span class="text-gray-700">Create User</span>
+                                <span class="text-gray-700">Create CHI</span>
                             </div>
                         </li>
                     </ol>
@@ -265,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-lg font-semibold text-gray-800">User Information</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">CHI Information</h2>
                             <p class="text-gray-500 text-sm mt-1">Enter details to create a new user account</p>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -310,9 +326,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 placeholder="Auto-generated"
                                 readonly
                             />
-                            <p class="mt-1 text-xs text-gray-500">Auto-generated from login name</p>
+                            <p class="mt-1 text-xs text-gray-500">Auto-generated from login name (spaces removed)</p>
                         </div>
-                        
+                        <script>
+                            // Remove spaces from login name and set as username
+                            document.getElementById('db_userLoginName').addEventListener('input', function() {
+                                let val = this.value.replace(/\s+/g, '');
+                                document.getElementById('db_username').value = val;
+                            });
+                        </script>
                         <div>
                             <label for="db_password" class="block text-sm font-medium text-gray-700 mb-2">Password*</label>
                             <input 
@@ -386,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 id="db_usertype" 
                                 name="db_usertype" 
                                 class="form-input" 
-                                value="owner"
+                                value="contactor"
                                 readonly
                             />
                         </div>
@@ -404,59 +426,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </div>
                         
                         <div>
-                            <label for="OrgID" class="block text-sm font-medium text-gray-700 mb-2">Organization*</label>
+                            <label for="OrgID" class="block text-sm font-medium text-gray-700 mb-2">Station*</label>
                             <select id="OrgID" name="OrgID" class="form-select" required>
-                                <option value="">Select Organization</option>
-                                <?php
-                                // Include database connection
-                                include "../../connection.php";
-
-                                // Fetch organizations from the database
-                                $result = $conn->query("SELECT db_Orgname, OrgID FROM baris_organization");
-
-                                if ($result && $result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<option value='" . htmlspecialchars($row['OrgID']) . "'>" . htmlspecialchars($row['db_Orgname']) . "</option>";
-                                    }
-                                }
-                                $conn->close();
-                                ?>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="DivisionId" class="block text-sm font-medium text-gray-700 mb-2">Division*</label>
-                            <select id="DivisionId" name="DivisionId" class="form-select" required>
-                                <option value="">Select Division</option>
-                                <?php
-                                // Include database connection
-                                include "../../connection.php";
-
-                                // Fetch divisions from the database
-                                $result = $conn->query("SELECT DivisionId, DivisionName FROM baris_division");
-
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<option value='" . htmlspecialchars($row['DivisionId']) . "'>" . htmlspecialchars($row['DivisionName']) . "</option>";
-                                    }
-                                }
-                                $conn->close();
-                                ?>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="StationId" class="block text-sm font-medium text-gray-700 mb-2">Station*</label>
-                            <select id="StationId" name="StationId" class="form-select" required>
                                 <option value="">Select Station</option>
                                 <?php
                                 // Include database connection
                                 include "../../connection.php";
 
-                                // Fetch stations from the database
-                                $result = $conn->query("SELECT stationId, stationName FROM baris_station");
+                                // Fetch stations from the database for Division ID 30
+                                $result = $conn->query("SELECT stationName, stationId FROM baris_station WHERE DivisionId = 30");
 
-                                if ($result->num_rows > 0) {
+                                if ($result && $result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
                                         echo "<option value='" . htmlspecialchars($row['stationId']) . "'>" . htmlspecialchars($row['stationName']) . "</option>";
                                     }
@@ -466,121 +446,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </select>
                         </div>
                         
-                        <div class="md:col-span-3">
-                            <h3 class="text-md font-medium text-gray-700 mb-3 flex items-center">
-                                <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>
-                                Validity & Payment
-                            </h3>
-                            <div class="h-px bg-gray-200 mb-4"></div>
-                        </div>
-                        
-                        <div>
-                            <label for="db_valid_from" class="block text-sm font-medium text-gray-700 mb-2">Valid From*</label>
-                            <input 
-                                type="datetime-local" 
-                                id="db_valid_from" 
-                                name="db_valid_from" 
-                                class="form-input" 
-                                required
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="db_valid" class="block text-sm font-medium text-gray-700 mb-2">Valid To*</label>
-                            <input 
-                                type="datetime-local" 
-                                id="db_valid" 
-                                name="db_valid" 
-                                class="form-input" 
-                                required
-                            />
-                        </div>
-                        
-                        <div></div> <!-- Empty div for alignment -->
-                        
-                        <div>
-                            <label for="paid_amount" class="block text-sm font-medium text-gray-700 mb-2">Paid Amount*</label>
-                            <input 
-                                type="number" 
-                                id="paid_amount" 
-                                name="paid_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                oninput="calculateTotal()"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="gst_amount" class="block text-sm font-medium text-gray-700 mb-2">GST Amount*</label>
-                            <input 
-                                type="number" 
-                                id="gst_amount" 
-                                name="gst_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                oninput="calculateTotal()"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="total_paid_amount" class="block text-sm font-medium text-gray-700 mb-2">Total Paid Amount*</label>
-                            <input 
-                                type="number" 
-                                id="total_paid_amount" 
-                                name="total_paid_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                readonly
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="renewal_amount" class="block text-sm font-medium text-gray-700 mb-2">Renewal Amount*</label>
-                            <input 
-                                type="number" 
-                                id="renewal_amount" 
-                                name="renewal_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                oninput="calculateRenewalTotal()"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="renewal_gst_amount" class="block text-sm font-medium text-gray-700 mb-2">Renewal GST Amount*</label>
-                            <input 
-                                type="number" 
-                                id="renewal_gst_amount" 
-                                name="renewal_gst_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                oninput="calculateRenewalTotal()"
-                            />
-                        </div>
-                        
-                        <div>
-                            <label for="renewal_total_amount" class="block text-sm font-medium text-gray-700 mb-2">Renewal Total Amount*</label>
-                            <input 
-                                type="number" 
-                                id="renewal_total_amount" 
-                                name="renewal_total_amount" 
-                                class="form-input" 
-                                step="0.01" 
-                                placeholder="0.00"
-                                required
-                                readonly
-                            />
-                        </div>
+                        <!-- Hidden fields for fixed values -->
+                        <input type="hidden" name="DivisionId" value="30" />
+                       
                     </div>
                     
                     <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-200">
@@ -589,7 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus mr-2"></i>
-                            Create User
+                            Create CHI
                         </button>
                     </div>
                 </form>
@@ -602,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                             <i class="fas fa-lightbulb text-blue-600"></i>
                         </div>
-                        <h3 class="font-semibold">Tips for Creating Users</h3>
+                        <h3 class="font-semibold">Tips for Creating CHI</h3>
                     </div>
                     <ul class="space-y-2 text-sm text-gray-600">
                         <li class="flex items-start">
