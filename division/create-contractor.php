@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button id="mobile-menu-button" class="mr-4 text-gray-600 md:hidden">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h1 class="text-xl font-bold text-gray-800">Create CHI</h1>
+                    <h1 class="text-xl font-bold text-gray-800">Create Contractor</h1>
                 </div>
                 
                 <div class="flex items-center space-x-4">
@@ -250,7 +250,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <li aria-current="page">
                             <div class="flex items-center">
                                 <i class="fas fa-chevron-right text-gray-400 mx-2 text-xs"></i>
-                                <span class="text-gray-700">Create CHI</span>
+                                <span class="text-gray-700">Create Contractor</span>
                             </div>
                         </li>
                     </ol>
@@ -281,7 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="p-6 border-b border-gray-200">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h2 class="text-lg font-semibold text-gray-800">CHI Information</h2>
+                            <h2 class="text-lg font-semibold text-gray-800">Contractor Information</h2>
                             <p class="text-gray-500 text-sm mt-1">Enter details to create a new user account</p>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -457,7 +457,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </a>
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-plus mr-2"></i>
-                            Create CHI
+                            Create Contractor
                         </button>
                     </div>
                 </form>
@@ -470,7 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
                             <i class="fas fa-lightbulb text-blue-600"></i>
                         </div>
-                        <h3 class="font-semibold">Tips for Creating CHI</h3>
+                        <h3 class="font-semibold">Tips for Creating Contractor</h3>
                     </div>
                     <ul class="space-y-2 text-sm text-gray-600">
                         <li class="flex items-start">

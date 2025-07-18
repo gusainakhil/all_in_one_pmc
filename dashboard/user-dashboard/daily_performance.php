@@ -219,9 +219,13 @@ $dateRange = new DatePeriod($start, $interval, $end);
                   <!-- <a href="daily_performance_report.php" target="_blank" class="btn btn-success">-->
                   <!--  <i class="fas fa-file-alt"></i> Daily Performance Log-->
                   <!--</a> -->
-                  <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
-                    <i class="fas fa-bullseye"></i> Daily Performance Target
-                  </a>
+
+
+                  <?php if (isset($_SESSION['token']) && !empty($_SESSION['token'])): ?>
+                    <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
+                      <i class="fas fa-bullseye"></i> Daily Performance Target
+                    </a>
+                  <?php endif; ?>
                 </div>
               </div>
             </div>  
