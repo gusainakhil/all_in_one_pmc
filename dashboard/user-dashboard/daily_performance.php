@@ -1,4 +1,5 @@
-<?php
+
+       <?php
 
 // Start the session
 session_start();
@@ -33,17 +34,42 @@ $dateRange = new DatePeriod($start, $interval, $end);
 <html lang="en">
 <!--begin::Head-->
 <?php include "head.php" ?>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  /* Performance dashboard styles */
-   .report-container {
-            width: 99%;
-            margin: auto;
-            page-break-after: always;
-            font-weight: 800;
-            font-size:11px;
-            font-family: 'Roboto' !IMPORTANT;
-        }
-  
+  .report-container {
+    width: 99%;
+    margin: auto;
+    page-break-after: always;
+    font-weight: 600;
+    font-size:14px;
+    font-family: 'Roboto', sans-serif !important;
+  }
+  .data-table th, .data-table td {
+    border: 1px solid #dee2e6;
+    text-align: center;
+    font-weight:400;
+    font-size:13px;
+  }
+  .signature-block {
+    text-align: center;
+    font-weight: bold;
+    margin: 30px 0 10px;
+  }
+  .signature-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+  }
+  .signature-lines {
+    display: flex;
+    justify-content: space-between;
+  }
+  .signature-line {
+    border-top: 1px solid #000;
+    width: 30%;
+    max-width: 200px;
+  }
+
   .filter-container {
     background-color: #f8f9fa;
     border-radius: 8px;
@@ -140,20 +166,39 @@ $dateRange = new DatePeriod($start, $interval, $end);
   
   /* Print styles */
   @media print {
-    .no-print {
-      display: none;
-    }
-    
-    body {
-      background-color: white;
-    }
-    
-    .performance-container {
-      box-shadow: none;
-      margin-bottom: 30px;
-      page-break-after: always;
-    }
+  .app-wrapper,
+  .app-main,
+  .app-content,
+  .container-fluid,
+  .row,
+  .performance-container,
+  .report-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
+
+  header,
+  footer,
+  .sidebar,
+  .app-header,
+  .app-sidebar,
+  .no-print,
+  .app-navbar {
+    display: none !important;
+  }
+
+  .report-container {
+    display: block !important;
+    page-break-after: always;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+ }
   
   /* Responsive adjustments */
   @media (max-width: 768px) {
@@ -172,7 +217,32 @@ $dateRange = new DatePeriod($start, $interval, $end);
       align-items: flex-start;
     }
   }
+  .print-button {
+            display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .print-button button {
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .print-button button:hover {
+        background-color: #0056b3;
+    }
+      
 </style>
+
+<script>
+        function printPage() {
+            window.print();
+        }
+</script>
 <!--end::Head-->
 <!--begin::Body-->
 
@@ -185,54 +255,62 @@ $dateRange = new DatePeriod($start, $interval, $end);
       <div class="app-content">
         <!--begin::Container-->
         <div class="container-fluid">
-          <div class="row">
-               <div class="col-lg-7 mb-3">
-              <div class="performance-container p-3">
-                <div class="d-flex justify-content-center align-items-center mb-3">
-                  <form method="get" class="no-print w-100" style="max-width: 500px;">
-                    <div class="row g-2 align-items-end">
-                      <div class="col">
-                        <input type="date" name="from_date" id="from_date" class="form-control" value="<?= htmlspecialchars($fromDate) ?>">
-                      </div>
-                      <div class="col">
-                        <input type="date" name="to_date" id="to_date" class="form-control" value="<?= htmlspecialchars($toDate) ?>">
-                      </div>
-                      <div class="col-auto">
-                        <button type="submit" class="btn btn-success px-4">
-                          <i class="fas fa-sync-alt me-1"></i> Go
-                        </button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+  <div class="row">
+    <!-- Date Selection Form -->
+    <div class="col-lg-5 mb-3">
+      <div class="performance-container p-3">
+        <div class="d-flex justify-content-center align-items-center mb-3">
+          <form method="get" class="no-print w-100" style="max-width: 500px;">
+            <div class="row g-2 align-items-end">
+              <div class="col">
+                <input type="date" name="from_date" id="from_date" class="form-control"
+                       value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+              </div>
+              <div class="col">
+                <input type="date" name="to_date" id="to_date" class="form-control"
+                       value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-success px-4">
+                  <i class="fas fa-sync-alt me-1"></i> Go
+                </button>
               </div>
             </div>
-            <div class="col-lg-5 mb-3">
-              <div class="performance-container p-3">
-                <div class="action-buttons no-print">
-                   <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
-                    <i class="fas fa-chart-pie"></i> Summary
-                  </a> 
-                  <!--<a href="daily_performance_summary_2.php?id=<?php echo $id; ?>" class="btn btn-success" target="_blank">-->
-                  <!--  <i class="fas fa-chart-bar"></i> Summary2 -->
-                  <!--</a>-->
-                  <!-- <a href="daily_performance_report.php" target="_blank" class="btn btn-success">-->
-                  <!--  <i class="fas fa-file-alt"></i> Daily Performance Log-->
-                  <!--</a> -->
+          </form>
+        </div>
+      </div>
+    </div>
 
-
+    <!-- Summary Buttons -->
+    <div class="col-lg-5 mb-3">
+      <div class="performance-container p-3">
+        <div class="action-buttons no-print">
+          <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
+            <i class="fas fa-chart-pie"></i> Summary
+          </a>
+          <a href="daily_performance_summary_2.php?id=<?= $id ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-chart-bar"></i> Summary2
+          </a>
+          
                   <?php if (isset($_SESSION['token']) && !empty($_SESSION['token'])): ?>
                     <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
                       <i class="fas fa-bullseye"></i> Daily Performance Target
                     </a>
                   <?php endif; ?>
-                </div>
-              </div>
-            </div>  
-            
-           
-          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="col-lg-2 mb-3">
+      <div class="performance-container p-3 text-center">
+        <button class="btn btn-primary no-print" style="background: #3c8dbc !important;" onclick="printPage()">ЁЯЦия╕П Print</button>
+      </div>
+    </div>
+  </div>
           
+            
+            
           <!-- Loading indicator -->
           <div id="loading-indicator" class="loading no-print">
             <div class="spinner-border text-primary" role="status"></div>

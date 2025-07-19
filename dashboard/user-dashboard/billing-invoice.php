@@ -330,40 +330,7 @@ $earnings_total = round($earnings_total, 2);
 $overallAverage = $overallAverage ?: 0;
 $consolidated_score = round($overallAverage, 2) . '%';
 
-// Fetch all penalties for the selected period and org
-$sql = "SELECT penalty_amount, penalty_review FROM `baris_penalty` WHERE created_date BETWEEN '$firstDay' AND '$lastDay' AND OrgID = $org_id";
-$result = $conn->query($sql);
 
-$deductions = [];
-$deductions_total = 0;
-
-if ($result && $result->num_rows > 0) {
-    $sn = 1;
-    while ($row = $result->fetch_assoc()) {
-        $amount = $row['penalty_amount'] ?? 0;
-        $review = $row['penalty_review'] ?? '';
-        $deductions[] = [
-            'sn' => $sn++,
-            'amount' => $amount,
-            'deduction' => $review
-        ];
-        $deductions_total += $amount;
-    }
-} else {
-    // No penalties found, add a default row
-    $deductions[] = [
-        'sn' => 1,
-  
-        'amount' => 0,
-        'deduction' => ''
-    ];
-    $deductions_total = 0;
-}
-
-$total_payable = $earnings_total - $deductions_total;
-$total_payable_rounded = round($total_payable);
-
-// Deductions
 // The following block is removed to prevent overwriting the $deductions array with an incompatible structure.
 // $deductions = [
 //     [$penalty_review, $penalty_amount, ],
@@ -431,6 +398,10 @@ function numberToWords($number) {
     <button type="submit" style="padding:8px 20px; background:#007bff; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; transition:background 0.2s;">
         Filter
     </button>
+    <!-- create impose penalty button  billing-invoice.php--> 
+    <button  type="button" id="impose-penalty" style="padding:8px 20px; background:#dc3545; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; transition:background 0.2s;">
+       <a href="impose-penalty.php" style="color: white; text-decoration: none;">Impose Penalty</a>
+    </button>
 </form>
 
 <!-- <div style="text-align:center;">
@@ -469,28 +440,106 @@ function numberToWords($number) {
         <tr><th colspan="4">TOTAL</th><th><?= number_format($earnings_total, 2) ?></th></tr>
     </table>
 
+    <?php
+    // Define all possible penalty types (hardcoded)
+    $all_penalty_types = [
+        'PASSENGER COMPLAINT',
+        'NON REMOVAL OF GARBAGE FROM DUSTBINS',
+        'OPEN BURNING OF WASTE IN RAILWAYS PREMISES',
+        'ROOF OF PLATFORM SHELTERS',
+        'MANPOWER AND UNIFORM PENALTY',
+        'PENALTY IMPOSED BY NGT',
+        'SPOT PENALTY',
+        'PENALTY IMPOSED DUE TO MACHINE SHORTAGE/ OUT OF ORDER',
+        'PENALTY IMPOSED DUE TO SHORTAGE OF MACHINE CONSUMABLES',
+        'PENALTY DUE TO NON AVAILABILITY OF CHEMICALS',
+        'MONITORING EQUIPMENTS PENALTY',
+        'MISCELLANEOUS'
+    ];
+
+    // Fetch all penalties for the selected period and org
+    $sql = "SELECT penalty_amount, penalty_review, penalty_type FROM `baris_penalty` WHERE created_date BETWEEN '$firstDay' AND '$lastDay' AND OrgID = $org_id";
+    $result = $conn->query($sql);
+
+    $deductions = [];
+    $deductions_total = 0;
+    $penalty_sums = array_fill_keys($all_penalty_types, 0);
+
+    if ($result && $result->num_rows > 0) {
+        $sn = 1;
+        while ($row = $result->fetch_assoc()) {
+            $amount = $row['penalty_amount'] ?? 0;
+            $review = $row['penalty_review'] ?? '';
+            $type = $row['penalty_type'] ?? 'MISCELLANEOUS';
+            $deductions[] = [
+                'sn' => $sn++,
+                'amount' => $amount,
+                'deduction' => $review,
+                'type' => $type
+            ];
+            $deductions_total += $amount;
+            if (isset($penalty_sums[$type])) {
+                $penalty_sums[$type] += $amount;
+            } else {
+                $penalty_sums['MISCELLANEOUS'] += $amount;
+            }
+        }
+    } else {
+        // No penalties found, add a default row
+        $deductions[] = [
+            'sn' => 1,
+            'amount' => 0,
+            'deduction' => '',
+            'type' => 'None'
+        ];
+        $deductions_total = 0;
+    }
+
+    $total_payable = $earnings_total - $deductions_total;
+    $total_payable_rounded = round($total_payable);
+    ?>
     <div class="section"><strong>DEDUCTIONS</strong></div>
     <table>
         <tr>
             <th>S.NO</th>
             <th>DEDUCTION</th>
-            <th colspan="2">Amount</th>
+            <th>TYPE</th>
+            <th>Amount</th>
         </tr>
-
         <?php foreach ($deductions as $row): ?>
             <tr>
                 <td><?= $row['sn'] ?></td>
                 <td><?= htmlspecialchars($row['deduction']) ?></td>
-                <td colspan="2"><?= number_format($row['amount'], 2) ?></td>
+                <td><?= htmlspecialchars($row['type']) ?></td>
+                <td><?= number_format($row['amount'], 2) ?></td>
             </tr>
         <?php endforeach; ?>
-        
-        
         <tr>
-            <th colspan="2">TOTAL</th>
-            <!-- <th><?= number_format($deductions_total, 2) ?></th> -->
-            <th colspan="2"><?= numberToWords(round($deductions_total)) ?></th>
-          
+            <th colspan="3">TOTAL</th>
+            <th><?= number_format($deductions_total, 2) ?></th>
+        </tr>
+    </table>
+
+    <div class="section"><strong>PENALTY TYPE SUMMARY</strong></div>
+    <table>
+        <tr>
+            <th>S.NO</th>
+            <th>Penalty Name</th>
+            <th>Total Amount</th>
+        </tr>
+        <?php
+        $sn = 1;
+        foreach ($all_penalty_types as $type):
+        ?>
+            <tr>
+                <td><?= $sn++ ?></td>
+                <td><?= htmlspecialchars($type) ?></td>
+                <td><?= number_format($penalty_sums[$type], 2) ?></td>
+            </tr>
+        <?php endforeach; ?>
+        <tr>
+            <th colspan="2">GRAND TOTAL</th>
+            <th><?= number_format(array_sum($penalty_sums), 2) ?></th>
         </tr>
     </table>
 
