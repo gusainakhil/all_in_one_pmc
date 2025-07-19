@@ -369,6 +369,172 @@ $station_id = $_SESSION['stationId']; ?>
                     </div>
                 </div>
             </div>
+            <!-- Additional penalty types can be added here OPEN BURNING OF WASTE IN RAILWAYS PREMISES -->
+            <!-- Additional penalty types can be added here OPEN BURNING OF WASTE IN RAILWAYS PREMISES -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOpenBurning">
+                    <button class="accordion-button collapsed penalty-header" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapseOpenBurning" aria-expanded="false" aria-controls="collapseOpenBurning">
+                        <i class="fas fa-fire-alt penalty-icon"></i>
+                        OPEN BURNING OF WASTE IN RAILWAYS PREMISES
+                    </button>
+                </h2>
+                <div id="collapseOpenBurning" class="accordion-collapse collapse" aria-labelledby="headingOpenBurning"
+                    data-bs-parent="#penaltyAccordion">
+                    <div class="accordion-body">
+                        <!-- Form for OpenBurningPenalty -->
+                        <form method="POST" action="" id="openBurningPenaltyForm" class="needs-validation" novalidate autocomplete="off">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold" for="open_burning_penalty_date">
+                                        <i class="fas fa-calendar me-2"></i>Penalty Date
+                                    </label>
+                                    <input type="date" class="form-control" name="open_burning_penalty_date" id="open_burning_penalty_date" required max="<?php echo date('Y-m-d'); ?>">
+                                    <div class="invalid-feedback">
+                                        Please select a valid date.
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold" for="open_burning_penalty_amount">
+                                        <i class="fas fa-rupee-sign me-2"></i>Penalty Amount
+                                    </label>
+                                    <input type="number" class="form-control" name="open_burning_penalty_amount" id="open_burning_penalty_amount" min="1" required>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid amount.
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold" for="open_burning_penalty_review">
+                                        <i class="fas fa-comment me-2"></i>Penalty Review
+                                    </label>
+                                    <textarea class="form-control" name="open_burning_penalty_review" id="open_burning_penalty_review" rows="2" required maxlength="500"></textarea>
+                                    <div class="invalid-feedback">
+                                        Please provide a review (max 500 chars).
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-submit mb-4 px-4 py-2">
+                                <i class="fas fa-plus me-2"></i>Submit Penalty
+                            </button>
+                        </form>
+                        <?php
+                        // Backend for OpenBurningPenalty submission
+                        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['open_burning_penalty_date'], $_POST['open_burning_penalty_amount'], $_POST['open_burning_penalty_review'])) {
+                            $date = mysqli_real_escape_string($conn, $_POST['open_burning_penalty_date']);
+                            $amount = (int) $_POST['open_burning_penalty_amount'];
+                            $review = mysqli_real_escape_string($conn, $_POST['open_burning_penalty_review']);
+
+                            if ($date && $amount > 0 && $review) {
+                                $insert = "INSERT INTO `baris_penalty` (`OrgID`, `penalty_type`, `penalty_date`, `penalty_amount`, `penalty_review`, `created_date`) VALUES ('$org_id', 'OpenBurningPenalty', '$date', '$amount', '$review', NOW())";
+                                if (mysqli_query($conn, $insert)) {
+                                    header("Location: " . $_SERVER['REQUEST_URI'] . "?openburning_success=1");
+                                    exit();
+                                } else {
+                                    echo '<div class="alert alert-danger mt-2">Error adding penalty. Please try again.</div>';
+                                }
+                            } else {
+                                echo '<div class="alert alert-warning mt-2">Please fill all fields correctly.</div>';
+                            }
+                        }
+                        // Show success message if redirected
+                        if (isset($_GET['openburning_success']) && $_GET['openburning_success'] == 1) {
+                            echo '<div class="alert alert-success mt-2">Open burning penalty added successfully.</div>';
+                        }
+                        ?>
+
+                        <?php
+                        $query = "SELECT * FROM `baris_penalty` WHERE `OrgID` = $org_id AND penalty_type = 'OpenBurningPenalty' ORDER BY penalty_date DESC";
+                        $result = mysqli_query($conn, $query);
+
+                        if (mysqli_num_rows($result) > 0) {
+                            ?>
+                            <div class="table-responsive mt-4">
+                                <table class="table penalty-table">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-calendar me-2"></i>Penalty Date</th>
+                                            <th><i class="fas fa-rupee-sign me-2"></i>Amount</th>
+                                            <th><i class="fas fa-comment me-2"></i>Review</th>
+                                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $total_penalty = 0;
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            $penalty_date = date('Y-m-d', strtotime($row['created_date']));
+                                            $penalty_amount = $row['penalty_amount'];
+                                            $penalty_review = $row['penalty_review'];
+                                            $total_penalty += $penalty_amount;
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <span class="fw-semibold"><?php echo $penalty_date; ?></span>
+                                                        <small class="text-muted">
+                                                            <?php
+                                                            $date1 = new DateTime($penalty_date);
+                                                            $date2 = new DateTime();
+                                                            $interval = $date1->diff($date2);
+                                                            if ($interval->y > 0) {
+                                                                echo $interval->y . ' year' . ($interval->y > 1 ? 's' : '') . ' ago';
+                                                            } elseif ($interval->m > 0) {
+                                                                echo $interval->m . ' month' . ($interval->m > 1 ? 's' : '') . ' ago';
+                                                            } elseif ($interval->d > 0) {
+                                                                echo $interval->d . ' day' . ($interval->d > 1 ? 's' : '') . ' ago';
+                                                            } else {
+                                                                echo 'Today';
+                                                            }
+                                                            ?>
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-danger fs-6">₹<?php echo number_format($penalty_amount); ?></span>
+                                                </td>
+                                                <td>
+                                                    <div class="text-start">
+                                                        <p class="mb-0"><?php echo htmlspecialchars($penalty_review); ?></p>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <button class="btn btn-outline-primary" title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                                <div class="text-end">
+                                    <span class="total-penalty">
+                                        <i class="fas fa-calculator me-2"></i>Total Penalty:
+                                        ₹<?php echo number_format($total_penalty); ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <?php
+                        } else {
+                            ?>
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-list"></i>
+                                <h5>No Penalties Recorded</h5>
+                                <p>No open burning penalties have been imposed yet.</p>
+                                <small class="text-muted">Add the first penalty using the form above.</small>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
 
             <!-- Enhanced second accordion item -->
             <div class="accordion-item">
@@ -427,7 +593,7 @@ $station_id = $_SESSION['stationId']; ?>
                         $review = mysqli_real_escape_string($conn, $_POST['garbage_penalty_review']);
 
                         if ($date && $amount > 0 && $review) {
-                            $insert = "INSERT INTO `baris_penalty` (`OrgID`, `penalty_type`, `penalty_date`, `penalty_amount`, `penalty_review`, `created_date`) VALUES ('$org_id', 'GarbagePenalty', '$date', '$amount', '$review', NOW())";
+                            $insert = "INSERT INTO `baris_penalty` (`OrgID`, `penalty_type`, `penalty_date`, `penalty_amount`, `penalty_review`, `created_date`) VALUES ('$org_id', 'NonremovalGarbagePenalty', '$date', '$amount', '$review', NOW())";
                             if (mysqli_query($conn, $insert)) {
                                 header("Location: " . $_SERVER['REQUEST_URI'] . "?garbage_success=1");
                                 exit();
@@ -445,7 +611,7 @@ $station_id = $_SESSION['stationId']; ?>
                     ?>
 
                     <?php
-                    $query = "SELECT * FROM `baris_penalty` WHERE `OrgID` = $org_id AND penalty_type = 'GarbagePenalty' ORDER BY penalty_date DESC";
+                    $query = "SELECT * FROM `baris_penalty` WHERE `OrgID` = $org_id AND penalty_type = 'NonremovalGarbagePenalty' ORDER BY penalty_date DESC";
                     $result = mysqli_query($conn, $query);
 
                     if (mysqli_num_rows($result) > 0) {
@@ -594,7 +760,7 @@ $station_id = $_SESSION['stationId']; ?>
                         $review = mysqli_real_escape_string($conn, $_POST['roof_penalty_review']);
 
                         if ($date && $amount > 0 && $review) {
-                            $insert = "INSERT INTO `baris_penalty` (`OrgID`, `penalty_type`, `penalty_date`, `penalty_amount`, `penalty_review`, `created_date`) VALUES ('$org_id', 'RoofPenalty', '$date', '$amount', '$review', NOW())";
+                            $insert = "INSERT INTO `baris_penalty` (`OrgID`, `penalty_type`, `penalty_date`, `penalty_amount`, `penalty_review`, `created_date`) VALUES ('$org_id', 'RodentWorkPenalty', '$date', '$amount', '$review', NOW())";
                             if (mysqli_query($conn, $insert)) {
                                 header("Location: " . $_SERVER['REQUEST_URI'] . "?roof_success=1");
                                 exit();
@@ -612,7 +778,7 @@ $station_id = $_SESSION['stationId']; ?>
                     ?>
 
                     <?php
-                    $query = "SELECT * FROM `baris_penalty` WHERE `OrgID` = $org_id AND penalty_type = 'RoofPenalty' ORDER BY penalty_date DESC";
+                    $query = "SELECT * FROM `baris_penalty` WHERE `OrgID` = $org_id AND penalty_type = 'RodentWorkPenalty' ORDER BY penalty_date DESC";
                     $result = mysqli_query($conn, $query);
 
                     if (mysqli_num_rows($result) > 0) {

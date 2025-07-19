@@ -36,7 +36,7 @@ $firstDay = date('Y-m-01', strtotime("$selectedYear-$selectedMonth-01"));
 $lastDay = date('Y-m-t', strtotime("$selectedYear-$selectedMonth-01"));
 
 
-echo $station_id ."<br>";
+// echo $station_id ."<br>";
 // Surprise visit score
 $sql = "
     SELECT 
@@ -373,6 +373,30 @@ function numberToWords($number) {
     <meta charset="UTF-8">
     <title>STATION CLEANING  Bill Invoice</title>
     <link rel="stylesheet" href="assets/css/billing.css">
+    <style>
+        /* create css for print buttton when we print then automatically hide the form  */
+        @media print {
+            .filter-form, #print-invoice, #impose-penalty {
+                display: none;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                font-size: 12px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 8px;
+               
+            }
+        }
+ 
+      
+      </style>
 </head>
 <body>
 <form method="get" class="filter-form" style="display:flex; justify-content:center; align-items:center; gap:16px; margin-bottom:24px; background:#f8f8f8; padding:16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
@@ -402,6 +426,16 @@ function numberToWords($number) {
     <button  type="button" id="impose-penalty" style="padding:8px 20px; background:#dc3545; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; transition:background 0.2s;">
        <a href="impose-penalty.php" style="color: white; text-decoration: none;">Impose Penalty</a>
     </button>
+    <!-- print button -->
+    <button type="button" id="print-invoice" onclick="printInvoice()" style="padding:8px 20px; background:#28a745; color:#fff; border:none; border-radius:4px; font-weight:600; cursor:pointer; transition:background 0.2s;">
+        Print Invoice
+    </button>
+    <script>
+        function printInvoice() {
+            window.print();
+        }
+    </script>
+
 </form>
 
 <!-- <div style="text-align:center;">
@@ -441,21 +475,17 @@ function numberToWords($number) {
     </table>
 
     <?php
-    // Define all possible penalty types (hardcoded)
-    $all_penalty_types = [
-        'PASSENGER COMPLAINT',
-        'NON REMOVAL OF GARBAGE FROM DUSTBINS',
-        'OPEN BURNING OF WASTE IN RAILWAYS PREMISES',
-        'ROOF OF PLATFORM SHELTERS',
-        'MANPOWER AND UNIFORM PENALTY',
-        'PENALTY IMPOSED BY NGT',
-        'SPOT PENALTY',
-        'PENALTY IMPOSED DUE TO MACHINE SHORTAGE/ OUT OF ORDER',
-        'PENALTY IMPOSED DUE TO SHORTAGE OF MACHINE CONSUMABLES',
-        'PENALTY DUE TO NON AVAILABILITY OF CHEMICALS',
-        'MONITORING EQUIPMENTS PENALTY',
-        'MISCELLANEOUS'
+    // Map penalty types to display names
+    $penalty_display_names = [
+        'NonremovalGarbagePenalty' => strtoupper('Non Removal Of Garbage from Dustbins'),
+        'OpenBurningPenalty' => strtoupper('Open Burning of Waste in Railways Premises'),
+        'RodentWorkPenalty' => strtoupper('Roof of platform shelters'),
+        'SpotPenalty' => strtoupper('SPOT PENALTY'),
+        'NGTPenalty' => strtoupper('Penalty Imposed by NGT'),
+        'OtherPenalty' => strtoupper('MISCELLANEOUS')
     ];
+
+    $all_penalty_types = array_keys($penalty_display_names);
 
     // Fetch all penalties for the selected period and org
     $sql = "SELECT penalty_amount, penalty_review, penalty_type FROM `baris_penalty` WHERE created_date BETWEEN '$firstDay' AND '$lastDay' AND OrgID = $org_id";
@@ -470,7 +500,7 @@ function numberToWords($number) {
         while ($row = $result->fetch_assoc()) {
             $amount = $row['penalty_amount'] ?? 0;
             $review = $row['penalty_review'] ?? '';
-            $type = $row['penalty_type'] ?? 'MISCELLANEOUS';
+            $type = $row['penalty_type'] ?? 'OtherPenalty';
             $deductions[] = [
                 'sn' => $sn++,
                 'amount' => $amount,
@@ -481,7 +511,8 @@ function numberToWords($number) {
             if (isset($penalty_sums[$type])) {
                 $penalty_sums[$type] += $amount;
             } else {
-                $penalty_sums['MISCELLANEOUS'] += $amount;
+                // If type not found, add to OtherPenalty
+                $penalty_sums['OtherPenalty'] += $amount;
             }
         }
     } else {
@@ -498,29 +529,8 @@ function numberToWords($number) {
     $total_payable = $earnings_total - $deductions_total;
     $total_payable_rounded = round($total_payable);
     ?>
-    <div class="section"><strong>DEDUCTIONS</strong></div>
-    <table>
-        <tr>
-            <th>S.NO</th>
-            <th>DEDUCTION</th>
-            <th>TYPE</th>
-            <th>Amount</th>
-        </tr>
-        <?php foreach ($deductions as $row): ?>
-            <tr>
-                <td><?= $row['sn'] ?></td>
-                <td><?= htmlspecialchars($row['deduction']) ?></td>
-                <td><?= htmlspecialchars($row['type']) ?></td>
-                <td><?= number_format($row['amount'], 2) ?></td>
-            </tr>
-        <?php endforeach; ?>
-        <tr>
-            <th colspan="3">TOTAL</th>
-            <th><?= number_format($deductions_total, 2) ?></th>
-        </tr>
-    </table>
 
-    <div class="section"><strong>PENALTY TYPE SUMMARY</strong></div>
+    <div class="section"><strong>DEDUCTIONS SUMMARY</strong></div>
     <table>
         <tr>
             <th>S.NO</th>
@@ -533,7 +543,7 @@ function numberToWords($number) {
         ?>
             <tr>
                 <td><?= $sn++ ?></td>
-                <td><?= htmlspecialchars($type) ?></td>
+                <td><?= htmlspecialchars($penalty_display_names[$type]) ?></td>
                 <td><?= number_format($penalty_sums[$type], 2) ?></td>
             </tr>
         <?php endforeach; ?>
