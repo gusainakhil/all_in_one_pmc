@@ -1,4 +1,5 @@
 <?php
+// include "../dashboard/user-dashboard/functions.php";
 
 $division_id = 30;
 session_start();
@@ -535,8 +536,7 @@ function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
               <div>
                 <div class="text-2xl font-bold">
                   <?php
-                  $num2 = rand(85, 87);
-                  echo $num2;
+                // getMonthlyFinalScore($stationId, $OrgID, $squeld, $month, $year, $conn);
                   ?>%
                 </div>
                 <div class="text-sm opacity-80">cleanliness report</div>

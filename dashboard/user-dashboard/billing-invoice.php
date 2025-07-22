@@ -1,8 +1,8 @@
 <?php 
 include "../../connection.php";
-session_start();
-
-if (!isset($_SESSION['OrgID'], $_SESSION['stationId'])) {
+include "functions.php";
+// session_start();
+            if (!isset($_SESSION['OrgID'], $_SESSION['stationId'])) {
     die("Session data missing.");
 }
 $org_id = $_SESSION['OrgID'];   
@@ -319,7 +319,7 @@ $machineConsumablesAmount = calculatealreportAmount($bill['sactioned_amount'], $
 //     ['PASSENGER FEEDBACK AND COMPLAINTS', "0", '0',"0"],
 // ];
 $earnings = [
-    ['CLEANLINESS RECORD', "$weightagec%", "88%", "$performanceConsumablesAmount"],
+    ['CLEANLINESS RECORD', "$weightagec%", getMonthlyFinalScore($stationId, $OrgID, $squeld, $month, $year, $conn), "$performanceConsumablesAmount"],
     ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "$totalWeight%", "$overallAverage%", "$surpriseVisitAmount"],
     ['PASSENGER FEEDBACK AND COMPLAINTS', "30%", '80%',"0"],
 ];

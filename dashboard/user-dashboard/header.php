@@ -148,17 +148,42 @@ $result = $stmt->get_result();
               }
 
              
-echo '<li class="nav-item">
+while ($row = $result->fetch_assoc()) {
+    // Safe session key
+    $key = str_replace(['/', '.'], '_', $row["subqueType"]);
+    $_SESSION[$key] = $row["report_id"];
+              
+
+    echo '<li class="nav-item">
         <a href="' . htmlspecialchars($row["subqueType"]) . '.php?id=' . htmlspecialchars($row["report_id"]) . '" class="nav-link"'
         . ($row["subqueType"] === '../feedback/index' ? ' target="_blank"' : '') . '>
             <i class="nav-icon bi bi-circle"></i>
             <p>' . htmlspecialchars($row["subqueName"]) . '</p>
         </a>
       </li>';
+}
 
 
             }
+
+
+
+//     [daily_machine] => 58
+//     [manpower_log] => 59
+//     [daily_surprise] => 61
+//     [daily_performance] => 62
+//     [machine_report_id] => 58
+// )
+///print machine_report_id session variable
+            
+
+
+
+
+
             ?>
+
+            
 
             <li class="nav-item">
               <a href="billing-invoice.php" class="nav-link" target="_blank">
