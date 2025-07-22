@@ -1,208 +1,492 @@
 <?php
+
+// Start the session
 session_start();
-include '../../connection.php';
- $station_id = $_SESSION['stationId'];
-$OrgID =$_SESSION['OrgID'];
-if (isset($_GET['id'])) {
-    $_SESSION['squeld'] = $_GET['id']; // Store it in session
-}
-$squeld = $_SESSION['squeld'];
-// $station_id = '44';
-$month = isset($_GET['month']) ? $_GET['month'] : date('n');
-$year = isset($_GET['year']) ? $_GET['year'] : date('Y');
 
-$startDate = "$year-" . str_pad($month, 2, '0', STR_PAD_LEFT) . "-01";
-$endDate = date("Y-m-t", strtotime($startDate));
-
-// Fetch achievement data
-$achievement_sql = "SELECT 
-    dpl.db_surveyPageId,
-    bs.stationName,
-    bd.DivisionName,
-    bpage.db_pagename AS Description_of_Items,
-    bpage.db_pageChoice2 AS Frequency,
-    bo.db_Orgname ,
-    SUBSTRING(bpage.db_pageChoice2, INSTR(bpage.db_pageChoice2, '@') + 1) AS Percentage_Weightage,
-    SUM(CASE WHEN bp.paramName = 'Shift 1' THEN dpl.db_surveyValue ELSE 0 END) AS Shift_1_Achievement,
-    SUM(CASE WHEN bp.paramName = 'Shift 2' THEN dpl.db_surveyValue ELSE 0 END) AS Shift_2_Achievement,
-    SUM(CASE WHEN bp.paramName = 'Shift 3' THEN dpl.db_surveyValue ELSE 0 END) AS Shift_3_Achievement
-FROM 
-    Daily_Performance_Log dpl
-JOIN baris_station bs ON dpl.db_surveyStationId = bs.stationId
-JOIN baris_division bd ON bs.DivisionId = bd.DivisionId
-JOIN baris_param bp ON dpl.db_surveyParamId = bp.paramId
-JOIN baris_page bpage ON dpl.db_surveyPageId = bpage.pageId
-JOIN baris_organization bo on dpl.OrgID=bo.OrgID
-WHERE 
-    dpl.db_surveyStationId = '$station_id'
-    AND dpl.created_date BETWEEN '$startDate' AND '$endDate'
-GROUP BY 
-    dpl.db_surveyPageId
-ORDER BY dpl.db_surveyPageId ASC";
-
-$achievement_result = $conn->query($achievement_sql);
-
-// Fetch monthly target data
-$target_sql = "SELECT pageId,
-    SUBSTRING_INDEX(value, ',', 1) AS Monthly_target_Shift1,
-    SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 2), ',', -1) AS Monthly_target_Shift2,
-    SUBSTRING_INDEX(SUBSTRING_INDEX(value, ',', 3), ',', -1) AS Monthly_target_Shift3
-FROM baris_target
-WHERE OrgID = '$OrgID' 
-    AND month = '$month' 
-    AND subqueId = '$squeld'
-ORDER BY id DESC
-LIMIT 24";
-
-$target_result = $conn->query($target_sql);
-$targets = [];
-while ($row = $target_result->fetch_assoc()) {
-    $targets[$row['pageId']] = [
-        'Monthly_target_Shift1' => $row['Monthly_target_Shift1'],
-        'Monthly_target_Shift2' => $row['Monthly_target_Shift2'],
-        'Monthly_target_Shift3' => $row['Monthly_target_Shift3']
-    ];
+// Check if userId is not set
+if (!isset($_SESSION['userId']) || empty($_SESSION['userId'])) {
+  // Destroy the session
+  session_unset();
+  session_destroy();
+  header("Location: https://pmc.beatleme.co.in/");
+  exit();
 }
 
-$avg_final_score = 0;
-$avg_final_score_raw = 0;
-$total_weightage_achieved = 0;
-$total_final_score = 0;
-$count_rows = 0;
+include_once "../../connection.php"; 
+$id = isset($_GET['id']) ? $_GET['id'] : '';
 
+// Get selected month/year from form or default to current
+$fromDate = isset($_GET['from_date']) ? $_GET['from_date'] : date('Y-m-01');
+$toDate = isset($_GET['to_date']) ? $_GET['to_date'] : date('Y-m-t');
+
+$station_id = $_SESSION['stationId'];
+
+// Create date range array
+$start = new DateTime($fromDate);
+$end = new DateTime($toDate);
+$end = $end->modify('+1 day');
+
+$interval = new DateInterval('P1D');
+$dateRange = new DatePeriod($start, $interval, $end);
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PMC - Daily Performance Log</title>
-  <link rel="stylesheet" href="assets/css/performace-log-summary2.css">
-</head>
-<body>
-  <form method="get">
-    <label>Month:
-      <select name="month">
-        <?php for ($m = 1; $m <= 12; $m++): ?>
-          <option value="<?= $m ?>" <?= ($month == $m) ? 'selected' : '' ?>><?= date('F', mktime(0, 0, 0, $m, 10)) ?></option>
-        <?php endfor; ?>
-      </select>
-    </label>
-    <label>Year:
-      <select name="year">
-        <?php for ($y = 2023; $y <= date('Y'); $y++): ?>
-          <option value="<?= $y ?>" <?= ($year == $y) ? 'selected' : '' ?>><?= $y ?></option>
-        <?php endfor; ?>
-      </select>
-    </label>
-    <button type="submit">View Report</button>
-  </form>
+<!--begin::Head-->
+<?php include "head.php" ?>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  .report-container {
+    width: 99%;
+    margin: auto;
+    page-break-after: always;
+    font-weight: 600;
+    font-size:14px;
+    font-family: 'Roboto', sans-serif !important;
+  }
+  .data-table th, .data-table td {
+    border: 1px solid #000;
+    text-align: center;
+    font-weight:400;
+    font-size:13px;
+  }
+  .signature-block {
+    text-align: center;
+    font-weight: bold;
+    margin: 30px 0 10px;
+  }
+  .signature-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
+  }
+  .signature-lines {
+    display: flex;
+    justify-content: space-between;
+  }
+  .signature-line {
+    border-top: 1px solid #000;
+    width: 30%;
+    max-width: 200px;
+  }
 
-  <div class="pmc-container">
-    <h2 class="pmc-title">Western Railway</h2>
-    <h3 class="pmc-subtitle">PMC - Daily Performance Log</h3>
-    <p class="pmc-meta">Daily uses of type and quantity of consumables of environmental sanitation, mechanized cleaning and housekeeping contract at Bhuj Railway station</p>
-    <div class="pmc-details">
-      <p><strong>Month:</strong> <?= date('F', mktime(0, 0, 0, $month, 10)) ?> - <?= $year ?></p>
-      <?php if ($achievement_result->num_rows > 0) {
-        $first_row = $achievement_result->fetch_assoc();
-        echo "<p><strong>Division:</strong> {$first_row['DivisionName']}</p>";
-        echo "<p><strong>Station:</strong> {$first_row['stationName']}</p>";
-        echo "<p><strong>Name Of Contractor:</strong> {$first_row['db_Orgname']}</p>";
-        $achievement_result->data_seek(0);  
-      } ?>
+  .filter-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .action-buttons .btn {
+    white-space: nowrap;
+    font-size: 14px;
+    display: flex;
+    align-items: center;  
+    gap: 5px;
+  }
+  
+  .report-header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+  .report-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #212529;
+  }
+  
+  .report-header h3 {
+    margin: 5px 0 0;
+    font-size: 16px;
+    color: #6c757d;
+    font-weight: normal;
+  }
+  
+  .meta-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .meta-info span {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+        font-size: 11px;
+    font-family: 'Roboto';
+  }
+  
+  .data-table th, .data-table td {
+   border: 1px solid #000;
+   text-align: center;
+  }
+  
+  .data-table th {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .data-table .desc {
+    text-align: left;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #6c757d;
+  }
+  
+  /* Print styles */
+  @media print {
+  .app-wrapper,
+  .app-main,
+  .app-content,
+  .container-fluid,
+  .row,
+  .performance-container,
+  .report-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  header,
+  footer,
+  .sidebar,
+  .app-header,
+  .app-sidebar,
+  .no-print,
+  .app-navbar {
+    display: none !important;
+  }
+
+  .report-container {
+    display: block !important;
+    page-break-after: always;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+ }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .filter-container {
+      flex-direction: column;
+    }
     
-    <p><strong>Monthly Final Score:</strong> <span id="monthly-final-score-display"></span></p>
-    <script>
-      // Get the value from the table's <td id="monthly-final-score">
-      document.addEventListener('DOMContentLoaded', function() {
-      var scoreTd = document.getElementById('monthly-final-score');
-      var displaySpan = document.getElementById('monthly-final-score-display');
-      if (scoreTd && displaySpan) {
-        displaySpan.textContent = scoreTd.textContent;
-      }
-      });
-    </script>
+    .filter-container input,
+    .filter-container button {
+      width: 100%;
+    }
+    
+    .meta-info {
+      flex-direction: column;
+      gap: 5px;
+      align-items: flex-start;
+    }
+  }
+  .print-button {
+            display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .print-button button {
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .print-button button:hover {
+        background-color: #0056b3;
+    }
+      
+</style>
 
+<script>
+        function printPage() {
+            window.print();
+        }
+</script>
+<!--end::Head-->
+<!--begin::Body-->
+
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+  <!--begin::App Wrapper-->
+  <div class="app-wrapper">
+    <?php include "header.php" ?>
+    <main class="app-main">
+      <!--begin::App Content Header-->
+      <div class="app-content">
+        <!--begin::Container-->
+        <div class="container-fluid">
+  <div class="row">
+    <!-- Date Selection Form -->
+    <div class="col-lg-5 mb-3">
+      <div class="performance-container p-3">
+        <div class="d-flex justify-content-center align-items-center mb-3">
+          <form method="get" class="no-print w-100" style="max-width: 500px;">
+            <div class="row g-2 align-items-end">
+              <div class="col">
+                <input type="date" name="from_date" id="from_date" class="form-control"
+                       value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>">
+              </div>
+              <div class="col">
+                <input type="date" name="to_date" id="to_date" class="form-control"
+                       value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>">
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-success px-4">
+                  <i class="fas fa-sync-alt me-1"></i> Go
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="pmc-table-wrapper">
-      <table class="pmc-table">
-        <thead>
-          <tr>
-            <th rowspan="2">S.No</th>
-            <th rowspan="2">Description of Items</th>
-            <th rowspan="2">Frequency</th>
-            <th rowspan="2">Percentage Weightage</th>
-            <th colspan="3">Monthly Target</th>
-            <th colspan="3">Monthly Achievement</th>
-            <th rowspan="2">Final Score</th>
-            <th rowspan="2">Weightage Achieved</th>
-          </tr>
-          <tr>
-            <th>Shift 1</th><th>Shift 2</th><th>Shift 3</th>
-            <th>Shift 1</th><th>Shift 2</th><th>Shift 3</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php if ($achievement_result->num_rows > 0): 
-            $i = 1;
-            while ($row = $achievement_result->fetch_assoc()):
-              $pageId = $row['db_surveyPageId'];
-                $target = $targets[$pageId] ?? ['Monthly_target_Shift1' => 0, 'Monthly_target_Shift2' => 0, 'Monthly_target_Shift3' => 0];
+    <!-- Summary Buttons -->
+    <div class="col-lg-5 mb-3">
+      <div class="performance-container p-3">
+        <div class="action-buttons no-print">
+          <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
+            <i class="fas fa-chart-pie"></i> Summary
+          </a>
+          <a href="daily_performance_summary_2.php?id=<?= $id ?>" class="btn btn-success" target="_blank">
+            <i class="fas fa-chart-bar"></i> Summary2
+          </a>
+               <?php if (isset($_SESSION['token']) && !empty($_SESSION['token'])): ?>
+                    <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
+                      <i class="fas fa-bullseye"></i> Daily Performance Target
+                    </a>
+                  <?php endif; ?>
+                  
+                
+                    <!--<a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">-->
+                    <!--  <i class="fas fa-bullseye"></i> Daily Performance Target-->
+                    <!--</a>-->
+         
+        </div>
+      </div>
+    </div>
 
-                // If any monthly shift target is zero, skip the calculation for which shift target is 0
-              if ($target['Monthly_target_Shift1'] == 0) {
-                  $row['Shift_1_Achievement'] = 0;
-              }
-              if ($target['Monthly_target_Shift2'] == 0) {
-                  $row['Shift_2_Achievement'] = 0;
-              }
-              if ($target['Monthly_target_Shift3'] == 0) {
-                  $row['Shift_3_Achievement'] = 0;
-              }
-
-              // Calculate final score and weightage achieved
-              $target_total = $target['Monthly_target_Shift1'] + $target['Monthly_target_Shift2'] + $target['Monthly_target_Shift3'];
-              $achieved_total = $row['Shift_1_Achievement'] + $row['Shift_2_Achievement'] + $row['Shift_3_Achievement'];
-              $final_score = $target_total > 0 ? ($achieved_total / $target_total) * 100 : 0;
-              $weightage_achieved = $final_score * floatval($row['Percentage_Weightage']) / 100;
-
-              $total_weightage_achieved += $weightage_achieved;
-              $total_final_score += $final_score;
-              $count_rows++;
-          ?>
-          <tr>
-            <td><?= $i++ ?></td>
-            <td><?= $row['Description_of_Items'] ?></td>
-            <td><?= strtok($row['Frequency'], '@') ?></td>
-            <td><?= $row['Percentage_Weightage'] ?></td>
-            <td><?= $target['Monthly_target_Shift1'] ?></td>
-            <td><?= $target['Monthly_target_Shift2'] ?></td>
-            <td><?= $target['Monthly_target_Shift3'] ?></td>
-            <td><?= $row['Shift_1_Achievement'] ?></td>
-            <td><?= $row['Shift_2_Achievement'] ?></td>
-            <td><?= $row['Shift_3_Achievement'] ?></td>
-            <td><?= number_format($final_score, 2) ?>%</td>
-            <td><?= number_format($weightage_achieved, 2) ?>%</td>
-          </tr>
-          <?php endwhile; 
-            $avg_final_score = $total_weightage_achieved;
-
-            $avg_final_score_raw = $total_final_score / $count_rows;
-          endif; ?>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="10" style="text-align:right;"><strong>Monthly Final Score:</strong></td>
-            <!-- <td><strong><?= number_format($avg_final_score_raw, 2) ?>%</strong></td> -->
-        
-            <td colspan="2" id="monthly-final-score" style="text-align: center;"><strong><?= number_format($avg_final_score, 2) ?>%</strong></td>
-
-      
-          </tr>
-        </tfoot>
-      </table>
+    <!-- Print Button -->
+    <div class="col-lg-2 mb-3">
+      <div class="performance-container p-3 text-center">
+        <button class="btn btn-primary no-print" style="background: #3c8dbc !important;" onclick="printPage()">ЁЯЦия╕П Print</button>
+      </div>
     </div>
   </div>
+          
+            
+            
+          <!-- Loading indicator -->
+          <div id="loading-indicator" class="loading no-print">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Calculating  performance data...</p>
+          </div>
+          
+          <!-- Report Container - will be shown after loading -->
+          <div class ="report-container" id="report-container" style="display: none;">
+            <?php
+            foreach ($dateRange as $dateObj) {
+              $currentDate = $dateObj->format("Y-m-d");
+
+              $query = "SELECT 
+                bap.paramName AS task, 
+                bp.db_pagename AS Description_of_Items, 
+                bas.db_surveyValue AS Quality_of_done_work,
+                bas.auditorname AS auditor_name,
+                bs.stationName AS station_name,
+                bo.db_Orgname AS organisation_name,
+                bd.DivisionName AS division_name,
+                bas.created_date AS report_date,
+                bp.db_pageChoice2 AS Frequency,
+                CONCAT(SUBSTRING(bp.db_pageChoice2, INSTR(bp.db_pageChoice2, '@')+1),'%') AS percentage_weightage
+              FROM 
+                baris_param bap
+                INNER JOIN Daily_Performance_Log bas ON bap.paramId = bas.db_surveyParamId
+                INNER JOIN baris_page bp ON bas.db_surveyPageId = bp.pageId
+                INNER JOIN baris_station bs ON bas.db_surveyStationId = bs.stationId
+                INNER JOIN baris_organization bo ON bas.OrgID = bo.OrgID
+                INNER JOIN baris_division bd ON bas.DivisionId = bd.DivisionId
+              WHERE 
+                DATE(bas.created_date) = '$currentDate' 
+                AND bas.db_surveyStationId = '$station_id'
+              ORDER BY bas.db_surveyPageId ASC";
+
+              $result = $conn->query($query);
+
+              $tasks = [];
+              $auditors = [
+                'shift_1' => [],
+                'shift_2' => [],
+                'shift_3' => []
+              ];
+
+              if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  $task = trim($row['Description_of_Items']);
+                  $percentage = $row['percentage_weightage'];
+                  $frequency = $row['Frequency'];
+                  $status = $row['Quality_of_done_work'] == 1 ? 'Y' : 'N';
+                  $shift = strtolower(str_replace(' ', '_', $row['task']));
+                  $auditorName = $row['auditor_name'];
+
+                  // Use percentage as part of task key to ensure uniqueness only if same percentage
+                  $uniqueTaskKey = $task . '||' . $percentage;
+
+                  if (!isset($tasks[$uniqueTaskKey])) {
+                    $tasks[$uniqueTaskKey] = [
+                      'task' => $task,
+                      'quantity' => 'As Available',
+                      'frequency' => $frequency,
+                      'percentage' => $percentage,
+                      'shift_1' => '',
+                      'shift_2' => '',
+                      'shift_3' => '',
+                      'remarks' => ''
+                    ];
+                  }
+
+                  $tasks[$uniqueTaskKey][$shift] = $status;
+
+                  // Track auditors per shift (avoid duplicates)
+                  if (!in_array($auditorName, $auditors[$shift])) {
+                    $auditors[$shift][] = $auditorName;
+                  }
+
+                  // Store division/station/org from first row
+                  $division = $row['division_name'];
+                  $station = $row['station_name'];
+                  $contractor = $row['organisation_name'];
+                }
+            ?>
+                <div class="performance-container mb-4">
+                  <div class="report-header">
+                    <h3 class ="text-center">Daily performance log book for cleaning schedule for environmental sanitation, mechanized cleaning and housekeeping contract at Tirupati <?= htmlspecialchars($station) ?> Railway Station</h3>
+                  </div>
+
+                  <div class="meta-info">
+                    <span><i class="far fa-calendar-alt me-1"></i> <strong>Date:</strong> <?= date('d M Y', strtotime($currentDate)) ?></span>
+                    <span><i class="fas fa-building me-1"></i> <strong>Division:</strong> <?= htmlspecialchars($division) ?></span>
+                    <span><i class="fas fa-map-marker-alt me-1"></i> <strong>Station:</strong> <?= htmlspecialchars($station) ?></span>
+                    <span><i class="fas fa-user-tie me-1"></i> <strong>Contractor:</strong> <?= htmlspecialchars($contractor) ?></span>
+                  </div>
+
+                  <div class="table-responsive">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th rowspan="2" style="width: 1%;">S.No</th>
+                          <th rowspan="2" style="width: 35%;" >Description of Items</th>
+                          <th rowspan="2" style="width: 6%;">App. Quantity</th>
+                          <th rowspan="2" style="width: 20%;">Frequency</th>
+                          <th rowspan="2" style="width:5%;">Percentage Weightage</th>
+                          <th colspan="3">Shifts</th>
+                          <th rowspan="2" style="width:1%">Remarks</th>
+                        </tr>
+                        <tr>
+                          <th style="width:3%">Shift 1<br>(Y/N)</th>
+                          <th style="width:3%">Shift 2<br>(Y/N)</th>
+                          <th style="width:3%">Shift 3<br>(Y/N)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <?php
+                        $sn = 1;
+                        foreach ($tasks as $taskData): ?>
+                          <tr>
+                            <td><?= $sn++ ?></td>
+                            <td class="desc"><?= htmlspecialchars($taskData['task']) ?></td>
+                            <td><?= $taskData['quantity'] ?></td>
+                            <td><?= $taskData['frequency'] ?></td>
+                            <td><?= $taskData['percentage'] ?></td>
+                            <td><?= $taskData['shift_1'] ?: '-' ?></td>
+                            <td><?= $taskData['shift_2'] ?: '-' ?></td>
+                            <td><?= $taskData['shift_3'] ?: '-' ?></td>
+                            <td><?= $taskData['remarks'] ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+
+                        <!-- Final rows for auditor names and signatures -->
+                        <tr>
+                          <td style="width:9%;" colspan="5"><strong>Name of Auditor</strong></td>
+                          <td style="width:3%;"><strong><?= !empty($auditors['shift_1']) ? $auditors['shift_1'][0] : '-' ?></strong></td>
+                          <td style="width:3%;"><strong><?= !empty($auditors['shift_2']) ? $auditors['shift_2'][0] : '-' ?></strong></td>
+                          <td style="width:3%;"><strong><?= !empty($auditors['shift_3']) ? $auditors['shift_3'][0] : '-' ?></strong></td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td colspan="5"><strong>Signature of On DUTY SUPERVISOR</strong></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+            <?php
+              } // end if data exists
+            } // end foreach loop
+            ?>
+          </div>
+          
+          <!-- Print button -->
+
+        </div>
+      </div>
+    </main>
+    <?php include "footer.php" ?>
+  </div>
+  
+  <!-- Simple script to hide loading indicator and show content -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Hide loading indicator and show report after page has loaded
+      setTimeout(function() {
+        document.getElementById('loading-indicator').style.display = 'none';
+        document.getElementById('report-container').style.display = 'block';
+      }, 500);
+    });
+  </script>
 </body>
+
 </html>
