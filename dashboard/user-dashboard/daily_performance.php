@@ -1,5 +1,4 @@
-
-       <?php
+<?php
 
 // Start the session
 session_start();
@@ -45,7 +44,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
     font-family: 'Roboto', sans-serif !important;
   }
   .data-table th, .data-table td {
-    border: 1px solid #dee2e6;
+    border: 1px solid #000;
     text-align: center;
     font-weight:400;
     font-size:13px;
@@ -141,9 +140,8 @@ $dateRange = new DatePeriod($start, $interval, $end);
   }
   
   .data-table th, .data-table td {
-    border: 1px solid #dee2e6;
-  
-    text-align: center;
+   border: 1px solid #000;
+   text-align: center;
   }
   
   .data-table th {
@@ -285,18 +283,23 @@ $dateRange = new DatePeriod($start, $interval, $end);
     <div class="col-lg-5 mb-3">
       <div class="performance-container p-3">
         <div class="action-buttons no-print">
-          <a href="daily_performance_summary.php" class="btn btn-success" target="_blank">
-            <i class="fas fa-chart-pie"></i> Summary
-          </a>
+          <!--<a href="daily_performance_summary.php" class="btn btn-success" target="_blank">-->
+          <!--  <i class="fas fa-chart-pie"></i> Summary old-->
+          <!--</a>-->
           <a href="daily_performance_summary_2.php?id=<?= $id ?>" class="btn btn-success" target="_blank">
-            <i class="fas fa-chart-bar"></i> Summary2
+            <i class="fas fa-chart-bar"></i> Summary
           </a>
-          
-                  <?php if (isset($_SESSION['token']) && !empty($_SESSION['token'])): ?>
+               <?php if (isset($_SESSION['token']) && !empty($_SESSION['token'])): ?>
                     <a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">
-                      <i class="fas fa-bullseye"></i> Daily Performance Target
+                      <i class="fas fa-bullseye"></i> Cleanliness report Target
                     </a>
                   <?php endif; ?>
+                  
+                
+                    <!--<a href="daily-performance-target.php?id=<?php echo $id; ?>" target="_blank" class="btn btn-success">-->
+                    <!--  <i class="fas fa-bullseye"></i> Daily Performance Target-->
+                    <!--</a>-->
+         
         </div>
       </div>
     </div>
@@ -474,7 +477,7 @@ $dateRange = new DatePeriod($start, $interval, $end);
     <?php include "footer.php" ?>
   </div>
   
-  <!-- Simple script to hide loading indicator and show content -->
+
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       // Hide loading indicator and show report after page has loaded

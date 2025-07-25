@@ -80,7 +80,8 @@ function calculate_division_psi($conn, $division_id) {
         $stmt_stations->close();
 
         if (empty($division_stations)) {
-            echo "<h2>No stations found in Division " . htmlspecialchars($division_id) . "</h2>";
+            // echo "<h2>No stations found in Division " . htmlspecialchars($division_id) . "</h2>";
+            echo "<p>80</p>";
             return;
         }
 
@@ -176,6 +177,7 @@ function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
 
         if (!$station) {
             throw new Exception("Station not found");
+            throw new Exception("80");
         }
 
         $station_name = $station['name'];
@@ -260,7 +262,7 @@ function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Division Manager Dashboard | Indian Railways</title>
+  <title>Division commercial  Dashboard | Indian Railways</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -407,7 +409,7 @@ function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
             <button id="mobile-menu-button" class="mr-4 text-gray-600 md:hidden">
               <i class="fas fa-bars"></i>
             </button>
-            <h1 class="text-xl font-bold text-gray-800">Division Manager Dashboard | Ahmedabad</h1>
+            <h1 class="text-xl font-bold text-gray-800">Division commercial Dashboard | Ahmedabad</h1>
           </div>
 
           <div class="flex items-center space-x-2 md:space-x-4">
@@ -550,7 +552,7 @@ function calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay) {
                 <div class="text-2xl font-bold">
                   <?php
                   calculate_division_psi($conn, $division_id);
-                  ?>%
+                  ?>
                 </div>
                 <div class="text-sm opacity-80">Passenger Feedback</div>
               </div>
@@ -824,7 +826,7 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
                     calculate_division_psi($conn, $division_id);
                
 
-                  ?>%
+                  ?>
                 </h3>
                 <p class="text-gray-500 text-sm">Passenger Feedback</p>
               </div>
@@ -1204,10 +1206,10 @@ AND bt.created_date BETWEEN '$firstDay' AND '$lastDay'";
         new Chart(weeklyFeedbackCtx, {
           type: 'bar',
           data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            labels: ['MON 1', 'TUE 2', 'WED 3', 'THU 4' , 'FRI 5' , 'SAT 6' ,'SUN 7' ],
             datasets: [{
               label: 'Passenger Feedback Count',
-              data: [120, 150, 180, 200],
+              data: [120, 150, 180, 200 , 140 , 80 , 220],
               backgroundColor: [
                 '#3b82f6',
                 '#10b981', 

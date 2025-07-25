@@ -22,9 +22,9 @@ $period = new DatePeriod(
     .railway-frame {
         height: 90vh;
         overflow-y: auto;
-         font-size:11px;
+         font-size:14px;
         box-sizing: border-box;
-            font-family: 'Roboto' !IMPORTANT;
+            /* font-family: 'Roboto' !IMPORTANT; */
     font-weight: 800;
         
     }
@@ -53,7 +53,7 @@ $period = new DatePeriod(
     .railway-section-title {
         text-align: center;
         font-weight: bold;
-        font-size:12px;
+        font-size:14px;
         
     }
 

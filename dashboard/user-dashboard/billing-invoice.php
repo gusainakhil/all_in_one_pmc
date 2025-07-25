@@ -1,9 +1,14 @@
 <?php 
+//print php error
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL); 
 include "../../connection.php";
 include "functions.php";
 // session_start();
             if (!isset($_SESSION['OrgID'], $_SESSION['stationId'])) {
     die("Session data missing.");
+   
 }
 $org_id = $_SESSION['OrgID'];   
 $station_id = $_SESSION['stationId'];
@@ -318,19 +323,28 @@ $machineConsumablesAmount = calculatealreportAmount($bill['sactioned_amount'], $
 //     ['MACHINE CONSUMABLES', "$weightage%", "$machineConsumablesPercentage%", "$machineConsumablesAmount"],
 //     ['PASSENGER FEEDBACK AND COMPLAINTS', "0", '0',"0"],
 // ];
+// this variable store $totalWeight% of ddaily surprise visir
 $earnings = [
-    ['CLEANLINESS RECORD', "$weightagec%", getMonthlyFinalScore($stationId, $OrgID, $squeld, $month, $year, $conn), "$performanceConsumablesAmount"],
-    ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "$totalWeight%", "$overallAverage%", "$surpriseVisitAmount"],
-    ['PASSENGER FEEDBACK AND COMPLAINTS', "30%", '80%',"0"],
+    ['CLEANLINESS RECORD', "50%", getMonthlyFinalScore($stationId, $OrgID, $squeld, $month, $year, $conn), "$performanceConsumablesAmount"],
+    ['SURPRISE VISITS CONDUCTED BY OFFICIALS OF INDIAN RAILWAYS', "20%", "$overallAverage%", "$surpriseVisitAmount"],
+    ['PASSENGER FEEDBACK', "20%", calculate_feedback_psi($conn, $station_id, $firstDay, $lastDay), "0"],
 ];
 
 $earnings_total = array_sum(array_column($earnings, 3));
 $earnings_total = round($earnings_total, 2);
-// Consolidated score
+// Consolidated score  
 $overallAverage = $overallAverage ?: 0;
-$consolidated_score = round($overallAverage, 2) . '%';
 
+// Calculate consolidated score as weighted sum of all earnings scores
+$consolidated_score = 0;
+foreach ($earnings as $row) {
+    $weight = floatval(str_replace('%', '', (string)$row[1]));
+    $score = floatval(str_replace('%', '', (string)$row[2]));
+    $consolidated_score += ($weight * $score) / 100;
+}
+$consolidated_score = round($consolidated_score, 2) . '%';
 
+$overallAverage = $overallAverage ?: 0;
 // The following block is removed to prevent overwriting the $deductions array with an incompatible structure.
 // $deductions = [
 //     [$penalty_review, $penalty_amount, ],
@@ -472,6 +486,11 @@ function numberToWords($number) {
         <?php endforeach; ?>
         <tr><td></td><td>CONSOLIDATED PERFORMANCE SCORE</td><td colspan="2"><?= $consolidated_score ?></td><td></td></tr>
         <tr><th colspan="4">TOTAL</th><th><?= number_format($earnings_total, 2) ?></th></tr>
+        <!-- <tr>
+            <td colspan="5" style="background:#f9f9f9; font-weight:500;">
+            Surprise Visit Amount is calculated for the selected month only (not daily).
+            </td>
+        </tr> -->
     </table>
 
     <?php

@@ -27,7 +27,7 @@
     </div>
 
     <!-- User Profile -->
-    <div class="px-4 py-3 border-b border-gray-800">
+    <!-- <div class="px-4 py-3 border-b border-gray-800">
       <div class="flex items-center">
         <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3">
           <span class="font-bold text-white">DM</span>
@@ -37,7 +37,7 @@
           <p class="text-xs text-gray-400">Western Railways</p>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Navigation -->
     <nav class="p-3">
@@ -59,12 +59,23 @@
           <i class="fas fa-tachometer-alt w-5 mr-3"></i>
           <span>Create CHI Dashboard</span>
         </a>
+        <a href="view-edit-chi.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+          <span>View/Edit CHI Dashboard</span>
+        </a>
 
         <a href="create-contractor.php"
           class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
           <i class="fas fa-users w-5 mr-3"></i>
           <span>Create Contractor</span>
         </a>
+             <a href="view-edit-contractor.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-user-edit w-5 mr-3"></i>
+          <span>View/Edit Contractor</span>
+        </a>  
+
 
         <a href="create-auditor.php"
           class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
@@ -72,6 +83,16 @@
           <span>Create Auditor</span>
         </a>
 
+        <!-- view and edit -->
+        <a href="view-edit-auditor.php"
+          class="flex items-center px-3 py-2 rounded hover:bg-blue-700 text-gray-300 hover:text-white transition-colors">
+          <i class="fas fa-user-edit w-5 mr-3"></i>
+          <span>View/Edit Auditor</span>
+        </a>
+         
+   
+
+  
 
         <!--<a href="reports.php" class="flex items-center px-3 py-2 rounded hover:bg-gray-800 text-gray-300 hover:text-white">-->
         <!--  <i class="fas fa-chart-line w-5 mr-3"></i>-->
